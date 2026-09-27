@@ -1,27 +1,55 @@
 # 1. Architecture
 
-_TBD during implementation._
+Generic deterministic replay in `src/replay/` reads a saved capability, validates inputs and
+references, opens a SurfaceAdapter session, binds values, executes ordered steps and returns a
+validated ReplayResult. Playwright stays inside its adapter. The demo's saved artifact reads fake
+member 12345's savings balance as 4321.09. Discovery and compilation are not implemented.
 
 # 2. Artifact schema
 
-_TBD during implementation._
+The JSON artifact declares inputs, outputs, ordered steps, logical targets with ordered locators,
+checkpoints, business outcomes, recovery budgets, and safety policy. Schema 1.1 adds checkpoint-based
+runtime conditions for failures, recoverable states, and intervention. Version 1.0 artifacts without
+conditions still validate. The fixture is manually authored, not evidence of an LLM discovery run.
 
 # 3. Determinism & error handling
 
-_TBD during implementation._
+Replay has no model dependency. Values live in an invocation context; output checkpoints execute
+there, while UI checks resolve through the adapter. Business outcomes precede subsequent extraction,
+so MEMBER_NOT_FOUND terminates normally. Recovery emits attempt events and uses declared recovery
+actions or bounded checkpoint rechecks. Uncertain original actions are never blindly repeated.
+Exhaustion defaults to failure or can request intervention. Tests cover all terminal categories,
+policy denial, value binding, checkpoints, strict transforms, evidence failure and cleanup.
 
 # 4. Heterogeneity & multi-tenant
 
-_TBD during implementation._
+The proxy uses imperfect labels, tables and an account iframe. Tests demonstrate semantic locator
+fallback and record the strategy index. Playwright types stay behind the surface boundary. Desktop
+support and tenant binding profiles are seams only; no desktop or multi-tenant portability claim
+has been demonstrated.
 
 # 5. Escalation & handoff
 
-_TBD during implementation._
+Intervention creates an InterventionRequest and retains the same live session plus context/events.
+Browser tests verify unchanged page identity, exclusive ownership, increasing epochs, rejected
+automation under human control, and stale-reference invalidation. Callers explicitly release the
+session. A headful browser permits manual interaction; the automated demo verifies transfer and
+reacquisition only. Human action recording and automatic continuation are unimplemented.
 
 # 6. Safety
 
-_TBD during implementation._
+Policy precedes opening and every execute call, including recovery. It constrains exact origins,
+anchored path patterns, action kinds and risk; irreversible actions block or require review. Runtime
+policy may further restrict approval. Explicit navigation is checked before execution; implicit
+form/link navigation is checked afterward, so this is not browser egress enforcement. Raw evidence
+is disabled by default in replay and enabled for the fake-data demo. It is unredacted and ignored
+by Git. Events omit invocation values and raw browser errors; returned outputs and handoff context
+remain sensitive caller-owned data.
 
 # 7. Cuts
 
-_TBD during implementation._
+No LLM provider, discovery loop, compiler, operator console, queue, database, remote API, desktop
+adapter, or tenant override engine is implemented. Recovery supports declared dismiss clicks and
+checkpoint rechecks. Automatic continuation, production redaction, authenticated artifact approval,
+and browser network restrictions remain gaps. The next task is navigation policy enforcement for
+links, forms and redirects before introducing discovery.

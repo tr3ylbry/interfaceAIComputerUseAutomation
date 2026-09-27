@@ -13,8 +13,16 @@ resolution itself succeeding or failing is not used to infer the business result
 
 A known transient/runtime condition with a bounded deterministic recovery policy, such as a slow load or known interstitial. Recoverable conditions are run events, not terminal replay results.
 
-The demo's host-busy interstitial has one explicit `Retry inquiry` action and a maximum of two
-attempts. Recovery is logged as a `recoverable_condition`; no model chooses the recovery.
+The artifact declares the host-busy checkpoint and a `transient_load` disposition. Its step policy
+allows two recovery attempts beyond the original action, using the explicit `Retry inquiry` target.
+Detection emits `recovered: false`; verified recovery emits `recovered: true` for the same attempt.
+An unsuccessful attempt remains false. A recovery event describes execution history; it cannot
+replace the terminal success, business outcome, failure, or intervention result.
+
+Timeout-only recovery rechecks the checkpoint after bounded backoff. It does not repeat a click
+that might already have taken effect. Uncertain action failures stop rather than retry. Exhaustion
+defaults to `failure/recovery_exhausted`; the caller may choose `recoveryExhaustion: "intervention"`.
+The `busy-always` proxy scenario verifies the limit deterministically.
 
 ## Intervention required
 
@@ -29,3 +37,14 @@ Execution stops with structured context including the failing step, expected sta
 
 The controlled permission-denied state maps to `permission_denied` and captures screenshot plus DOM
 evidence. Those raw artifacts are marked unredacted and are not committed.
+
+Generic failures include step ID when a step has started, a stable failure code, value-free
+expected/observed diagnostics where available, recovery history, and evidence references. Capture
+failure is recorded without replacing the original failure. Cleanup failures turn an otherwise
+successful run into `surface_error`; they append context to an existing failure. Invalid artifacts
+or inputs fail before opening, using `unexpected_state` from the existing result vocabulary.
+
+Declared hard/intervention guards take precedence over recoverable guards and business outcomes.
+Business outcomes are checked before the step checkpoint and before subsequent extraction. Missing
+business-message targets mean no matching outcome, not MEMBER_NOT_FOUND. Ordinary missing action
+targets fail with `target_not_found`.

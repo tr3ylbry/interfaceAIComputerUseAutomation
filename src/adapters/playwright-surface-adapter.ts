@@ -54,6 +54,7 @@ type PlaywrightSessionState = {
   interventionId?: string;
   controlHistory: Array<{ phase: ControlPhase; owner: ControlOwner; epoch: number }>;
   traceActive: boolean;
+  actionInFlight: boolean;
 };
 
 type LocatorRoot = {
@@ -106,29 +107,36 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     }
 
     const browser = await chromium.launch({ headless: this.headless });
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    page.setDefaultTimeout(this.actionTimeoutMs);
-    await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
-    await page.goto(target.entryPoint, { waitUntil: "domcontentloaded" });
+    try {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      page.setDefaultTimeout(this.actionTimeoutMs);
+      page.setDefaultNavigationTimeout(this.actionTimeoutMs);
+      await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
+      await page.goto(target.entryPoint, { waitUntil: "domcontentloaded" });
 
-    const session: SurfaceSession = { id: randomUUID(), kind: "web" };
-    const state: PlaywrightSessionState = {
-      session,
-      browser,
-      context,
-      page,
-      pageIdentity: randomUUID(),
-      targetsByRef: new Map(),
-      targetRefsById: new Map(),
-      owner: "automation",
-      phase: "automation_running",
-      epoch: 0,
-      controlHistory: [{ phase: "automation_running", owner: "automation", epoch: 0 }],
-      traceActive: true,
-    };
-    this.sessions.set(session.id, state);
-    return session;
+      const session: SurfaceSession = { id: randomUUID(), kind: "web" };
+      const state: PlaywrightSessionState = {
+        session,
+        browser,
+        context,
+        page,
+        pageIdentity: randomUUID(),
+        targetsByRef: new Map(),
+        targetRefsById: new Map(),
+        owner: "automation",
+        phase: "automation_running",
+        epoch: 0,
+        controlHistory: [{ phase: "automation_running", owner: "automation", epoch: 0 }],
+        traceActive: true,
+        actionInFlight: false,
+      };
+      this.sessions.set(session.id, state);
+      return session;
+    } catch (error) {
+      await browser.close().catch(() => undefined);
+      throw error;
+    }
   }
 
   async observe(session: SurfaceSession): Promise<SurfaceObservation> {
@@ -186,6 +194,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     descriptor: TargetDescriptor,
   ): Promise<ResolvedTarget> {
     const state = this.getAutomationState(session);
+    const epoch = state.epoch;
     const root = this.rootForDescriptor(state.page, descriptor);
     const attempted: string[] = [];
 
@@ -193,6 +202,10 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
       attempted.push(strategy.kind);
       const target = await this.tryStrategy(state.page, root, strategy);
       if (!target) continue;
+
+      if (state.epoch !== epoch || state.owner !== "automation") {
+        throw new PlaywrightSurfaceError("stale_operation", "Control changed during target resolution");
+      }
 
       const runtimeRef = `target-${randomUUID()}`;
       state.targetsByRef.set(runtimeRef, target);
@@ -213,10 +226,12 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     let state: PlaywrightSessionState;
     try {
       state = this.getAutomationState(session);
+      if (state.actionInFlight) throw new PlaywrightSurfaceError("session_busy", "An action is already in flight");
     } catch (error) {
       return this.actionError(error);
     }
 
+    state.actionInFlight = true;
     try {
       if (action.kind === "navigate") {
         await state.page.goto(action.destination, { waitUntil: "domcontentloaded" });
@@ -279,6 +294,8 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
       }
     } catch (error) {
       return this.actionError(error);
+    } finally {
+      state.actionInFlight = false;
     }
   }
 
@@ -362,6 +379,9 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     interventionId: Identifier,
   ): Promise<HumanControlHandle> {
     const state = this.getAutomationState(session);
+    if (state.actionInFlight) throw new PlaywrightSurfaceError("session_busy", "Cannot transfer control during an action");
+    state.targetsByRef.clear();
+    state.targetRefsById.clear();
     this.transition(state, "paused_for_intervention", "none");
     state.interventionId = interventionId;
     this.transition(state, "human_control", "human");
@@ -445,8 +465,8 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
       return { kind: "coordinate", x: strategy.x, y: strategy.y };
     }
 
-    const locator = this.locatorForStrategy(root, strategy).first();
-    return (await locator.count()) > 0 ? { kind: "locator", locator } : undefined;
+    const locator = this.locatorForStrategy(root, strategy);
+    return (await locator.count()) === 1 ? { kind: "locator", locator } : undefined;
   }
 
   private locatorForStrategy(
@@ -525,6 +545,18 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
 
     try {
       if (checkpoint.kind === "element_state") {
+        // Replay uses a one-millisecond probe budget and owns the outer wait loop.
+        // A waitFor deadline this small can expire before reading an already-visible node.
+        if (checkpoint.timeoutMs === 1) {
+          const attached = await target.locator.count() > 0;
+          let matched: boolean;
+          if (checkpoint.state === "attached") matched = attached;
+          else if (checkpoint.state === "detached") matched = !attached;
+          else if (checkpoint.state === "visible") matched = attached && await target.locator.isVisible();
+          else if (checkpoint.state === "hidden") matched = !attached || await target.locator.isHidden();
+          else matched = attached && (await target.locator.isEnabled()) === (checkpoint.state === "enabled");
+          return { matched, observed: matched ? checkpoint.state : "not_matched" };
+        }
         if (["visible", "hidden", "attached", "detached"].includes(checkpoint.state)) {
           await target.locator.waitFor({
             state: checkpoint.state as "visible" | "hidden" | "attached" | "detached",
@@ -542,7 +574,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
 
       const observed =
         checkpoint.kind === "text"
-          ? ((await target.locator.textContent()) ?? "")
+          ? ((await target.locator.textContent({ timeout: checkpoint.timeoutMs })) ?? "")
           : await target.locator.inputValue({ timeout: checkpoint.timeoutMs });
       return this.compare(
         observed,

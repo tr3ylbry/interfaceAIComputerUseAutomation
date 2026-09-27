@@ -137,6 +137,7 @@ describe("PlaywrightSurfaceAdapter", () => {
     });
 
     try {
+      const stale = await adapter.resolveTarget(session, memberIdTarget);
       const before = adapter.getSessionSnapshot(session);
       await adapter.relinquishToHuman(session, "intervention-1");
       const during = adapter.getSessionSnapshot(session);
@@ -159,6 +160,8 @@ describe("PlaywrightSurfaceAdapter", () => {
       });
 
       await adapter.reacquireFromHuman(session, "intervention-1");
+      expect(await adapter.execute(session, { kind: "fill", targetRef: stale.runtimeRef, value: "stale", clearFirst: true }))
+        .toMatchObject({ ok: false, error: { code: "unknown_target_ref" } });
       const after = adapter.getSessionSnapshot(session);
       expect(after).toMatchObject({
         sessionId: before.sessionId,
@@ -177,6 +180,18 @@ describe("PlaywrightSurfaceAdapter", () => {
     } finally {
       await adapter.close(session);
     }
+  });
+
+  it("rejects handoff while an action is in flight", async () => {
+    const adapter = createAdapter();
+    const session = await adapter.open({ surfaceKind: "web", entryPoint: `${requiredServer().baseUrl}/member-search` });
+    try {
+      const target = await adapter.resolveTarget(session, memberIdTarget);
+      const action = adapter.execute(session, { kind: "fill", targetRef: target.runtimeRef, value: "12345", clearFirst: true });
+      await expect(adapter.relinquishToHuman(session, "overlap")).rejects.toMatchObject({ code: "session_busy" });
+      expect(await action).toMatchObject({ ok: true });
+      expect(adapter.getSessionSnapshot(session).owner).toBe("automation");
+    } finally { await adapter.close(session); }
   });
 
   it("returns the savings balance through the iframe-backed success path", async () => {

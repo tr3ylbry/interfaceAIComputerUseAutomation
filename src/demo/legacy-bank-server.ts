@@ -6,6 +6,7 @@ export type LegacyBankScenario =
   | "success"
   | "not-found"
   | "slow"
+  | "busy-always"
   | "permission-denied"
   | "intervention";
 
@@ -18,6 +19,7 @@ const VALID_SCENARIOS = new Set<LegacyBankScenario>([
   "success",
   "not-found",
   "slow",
+  "busy-always",
   "permission-denied",
   "intervention",
 ]);
@@ -49,8 +51,8 @@ export async function startLegacyBankServer(
         sendHtml(response, 200, memberNotFoundPage(memberId));
         return;
       }
-      if (scenario === "slow" && url.searchParams.get("recovered") !== "1") {
-        sendHtml(response, 503, busyInterstitialPage(memberId));
+      if (scenario === "busy-always" || (scenario === "slow" && url.searchParams.get("recovered") !== "1")) {
+        sendHtml(response, 503, busyInterstitialPage(memberId, scenario));
         return;
       }
       sendHtml(response, 200, memberDetailPage(scenario));
@@ -123,13 +125,13 @@ function memberNotFoundPage(memberId: string): string {
   );
 }
 
-function busyInterstitialPage(memberId: string): string {
+function busyInterstitialPage(memberId: string, scenario: LegacyBankScenario): string {
   return layout(
     "Host Busy",
     `<div class="interstitial" role="status">
        <h2>Core host is temporarily busy</h2>
        <p>The inquiry can be retried safely.</p>
-       <a class="legacy-button" href="/members/lookup?memberNumber=${encodeURIComponent(memberId)}&scenario=slow&recovered=1">Retry inquiry</a>
+       <a class="legacy-button" href="/members/lookup?memberNumber=${encodeURIComponent(memberId)}&scenario=${scenario}&recovered=1">Retry inquiry</a>
      </div>`,
   );
 }

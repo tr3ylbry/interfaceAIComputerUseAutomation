@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "capability": {
     "id": "legacy-core.member.read-savings-balance",
     "version": "0.1.0",
@@ -37,6 +37,26 @@
     }
   ],
   "targets": [
+    {
+      "id": "permission-denied",
+      "description": "Explicit access-denied application state",
+      "strategies": [{ "kind": "text", "text": "Permission denied", "exact": true }]
+    },
+    {
+      "id": "operator-warning",
+      "description": "Unexpected dialog requiring operator review",
+      "strategies": [{ "kind": "selector", "engine": "css", "selector": "dialog[open]" }]
+    },
+    {
+      "id": "host-busy",
+      "description": "Known temporary host-busy state",
+      "strategies": [{ "kind": "text", "text": "Core host is temporarily busy", "exact": true }]
+    },
+    {
+      "id": "retry-inquiry",
+      "description": "Safe inquiry retry link on the known busy screen",
+      "strategies": [{ "kind": "text", "text": "Retry inquiry", "exact": true }]
+    },
     {
       "id": "member-id-input",
       "description": "Member identifier search input",
@@ -203,7 +223,8 @@
       "id": "transient-search-load",
       "appliesTo": ["timeout", "transient_load"],
       "maxAttempts": 2,
-      "backoffMs": 500
+      "backoffMs": 0,
+      "dismissTargetId": "retry-inquiry"
     }
   ],
   "successCondition": {
@@ -212,6 +233,23 @@
     "operator": "defined",
     "timeoutMs": 1000
   },
+  "runtimeConditions": [
+    {
+      "id": "permission-denied-state",
+      "when": { "kind": "element_state", "targetId": "permission-denied", "state": "visible", "timeoutMs": 100 },
+      "disposition": { "kind": "failure", "code": "permission_denied" }
+    },
+    {
+      "id": "operator-warning-state",
+      "when": { "kind": "element_state", "targetId": "operator-warning", "state": "visible", "timeoutMs": 100 },
+      "disposition": { "kind": "intervention", "reason": "unexpected_state" }
+    },
+    {
+      "id": "host-busy-state",
+      "when": { "kind": "element_state", "targetId": "host-busy", "state": "visible", "timeoutMs": 100 },
+      "disposition": { "kind": "recoverable", "code": "transient_load" }
+    }
+  ],
   "policy": {
     "allowedOrigins": ["http://127.0.0.1:3000"],
     "allowedPathPatterns": ["/member-search", "/members/*"],

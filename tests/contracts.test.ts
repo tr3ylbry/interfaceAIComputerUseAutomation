@@ -11,6 +11,11 @@ describe("CapabilityArtifact", () => {
     const result = CapabilityArtifactSchema.safeParse(fixture);
     expect(result.success).toBe(true);
   });
+
+  it("requires version 1.1 for safety conditions while accepting older artifacts without them", () => {
+    expect(CapabilityArtifactSchema.safeParse({ ...fixture, schemaVersion: "1.0" }).success).toBe(false);
+    expect(CapabilityArtifactSchema.safeParse({ ...fixture, schemaVersion: "1.0", runtimeConditions: [] }).success).toBe(true);
+  });
 });
 
 describe("human control state machine", () => {

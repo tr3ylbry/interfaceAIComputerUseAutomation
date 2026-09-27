@@ -120,8 +120,18 @@ export const RecoveryPolicySchema = z.object({
 
 export type RecoveryPolicy = z.infer<typeof RecoveryPolicySchema>;
 
+export const RuntimeConditionSchema = z.object({
+  id: IdentifierSchema,
+  when: CheckpointSchema,
+  disposition: z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("failure"), code: z.enum(["permission_denied", "session_expired", "unexpected_state"]) }),
+    z.object({ kind: z.literal("intervention"), reason: z.enum(["unexpected_state", "risky_action_requires_confirmation"]) }),
+    z.object({ kind: z.literal("recoverable"), code: z.enum(["timeout", "known_dialog", "transient_load"]) }),
+  ]),
+});
+
 export const CapabilityArtifactSchema = z.object({
-  schemaVersion: z.literal("1.0"),
+  schemaVersion: z.enum(["1.0", "1.1"]),
   capability: z.object({
     id: IdentifierSchema,
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
@@ -143,6 +153,7 @@ export const CapabilityArtifactSchema = z.object({
   steps: z.array(CapabilityStepSchema).min(1),
   businessOutcomes: z.array(BusinessOutcomeDefinitionSchema).default([]),
   recoveryPolicies: z.array(RecoveryPolicySchema).default([]),
+  runtimeConditions: z.array(RuntimeConditionSchema).default([]),
   successCondition: CheckpointSchema,
   policy: z.object({
     allowedOrigins: z.array(z.string().min(1)).min(1),
@@ -158,6 +169,9 @@ export const CapabilityArtifactSchema = z.object({
     compilerVersion: z.string().min(1),
   }),
 }).superRefine((artifact, ctx) => {
+  if (artifact.schemaVersion === "1.0" && artifact.runtimeConditions.length > 0) {
+    ctx.addIssue({ code: "custom", message: "runtime conditions require schema version 1.1", path: ["schemaVersion"] });
+  }
   const inputNames = new Set(artifact.inputs.map((input) => input.name));
   const outputNames = new Set(artifact.outputs.map((output) => output.name));
   const targetIds = new Set(artifact.targets.map((target) => target.id));
