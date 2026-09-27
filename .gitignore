@@ -9,3 +9,7 @@ test-results/
 evidence/runtime/
 *.log
 .DS_Store
+
+# Private project-management and interview-preparation notes
+docs/documentation-process.md
+docs/interview-defense.md
