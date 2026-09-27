@@ -21,3 +21,9 @@ An early abstraction can become overly generic. The interface must stay small an
 ## Revisit if
 
 The Playwright implementation repeatedly leaks browser-specific concepts into capability or replay contracts.
+
+## Implementation evidence (2026-09-27)
+
+The first adapter implemented navigation, observation, ordered target resolution, click/fill/select/read,
+checkpoints, evidence, lifecycle, and same-session handoff without adding Playwright types to the core
+contracts. Opaque runtime references were sufficient. The decision remains accepted.

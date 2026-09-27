@@ -51,6 +51,11 @@
           "kind": "label",
           "label": "Member ID",
           "exact": true
+        },
+        {
+          "kind": "selector",
+          "engine": "css",
+          "selector": "input[name='memberNumber']"
         }
       ]
     },
@@ -72,8 +77,26 @@
       ]
     },
     {
+      "id": "account-information-link",
+      "description": "Account information navigation link",
+      "strategies": [
+        {
+          "kind": "accessibility",
+          "role": "link",
+          "name": "Account Information",
+          "exact": true
+        },
+        {
+          "kind": "text",
+          "text": "Account Information",
+          "exact": true
+        }
+      ]
+    },
+    {
       "id": "savings-balance-value",
-      "description": "Savings balance value on member detail",
+      "description": "Savings balance value in the account-information frame",
+      "framePath": ["iframe[name='accountPane']"],
       "strategies": [
         {
           "kind": "relative",
@@ -81,6 +104,11 @@
           "relation": "nearest",
           "controlHint": "value",
           "ordinal": 1
+        },
+        {
+          "kind": "selector",
+          "engine": "xpath",
+          "selector": "//tr[td[normalize-space()='Savings']]//span[contains(@class, 'balance-value')]"
         }
       ]
     },
@@ -121,7 +149,7 @@
         "conditions": [
           {
             "kind": "element_state",
-            "targetId": "savings-balance-value",
+            "targetId": "account-information-link",
             "state": "visible",
             "timeoutMs": 10000
           },
@@ -132,6 +160,19 @@
             "timeoutMs": 10000
           }
         ]
+      }
+    },
+    {
+      "id": "open-account-information",
+      "description": "Open account information for the located member.",
+      "risk": "read_only",
+      "action": "click",
+      "targetId": "account-information-link",
+      "checkpoint": {
+        "kind": "url",
+        "operator": "contains",
+        "expected": "/accounts",
+        "timeoutMs": 5000
       }
     },
     {

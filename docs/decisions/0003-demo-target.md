@@ -21,3 +21,11 @@ Because we own the target, it could look artificially convenient. The implementa
 ## Revisit if
 
 Building the proxy starts consuming time that belongs in the automation system.
+
+## Implementation evidence (2026-09-27)
+
+The minimal proxy now supports member search, member detail, account information, and a savings
+balance using fake data. Deterministic query scenarios cover success, member-not-found, a recoverable
+host-busy interstitial, permission denial, and a risky intervention dialog. Its table layout,
+imperfect member label, missing test IDs, and account iframe exercise the adapter without expanding
+the proxy into a product UI. The decision remains accepted.

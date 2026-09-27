@@ -5,6 +5,9 @@
   "description": "Take-home implementation for a discover-once, deterministic-replay computer-use automation system.",
   "type": "module",
   "scripts": {
+    "build": "tsc",
+    "proxy": "npm run build && node dist/src/demo/legacy-bank-server.js",
+    "demo": "npm run build && node dist/src/vertical-slice/run-demo.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
@@ -13,6 +16,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
+    "playwright": "^1.63.0",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
