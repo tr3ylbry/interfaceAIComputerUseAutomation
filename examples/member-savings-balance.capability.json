@@ -1,0 +1,185 @@
+{
+  "schemaVersion": "1.0",
+  "capability": {
+    "id": "legacy-core.member.read-savings-balance",
+    "version": "0.1.0",
+    "name": "Read member savings balance",
+    "description": "Look up a member and return the current savings balance.",
+    "approvalState": "draft"
+  },
+  "target": {
+    "application": "LegacyCore Demo",
+    "productFamily": "legacy-core-demo",
+    "surfaceKind": "web",
+    "entryPoint": "http://127.0.0.1:3000/member-search",
+    "bindingProfile": "legacy-core-demo.base"
+  },
+  "inputs": [
+    {
+      "name": "member_id",
+      "type": "string",
+      "description": "Fake demo member identifier supplied by the caller.",
+      "required": true,
+      "sensitive": true,
+      "validation": {
+        "minLength": 1,
+        "maxLength": 32
+      }
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savings_balance",
+      "type": "currency",
+      "description": "Current savings balance for the located fake demo member.",
+      "required": true,
+      "sensitive": true
+    }
+  ],
+  "targets": [
+    {
+      "id": "member-id-input",
+      "description": "Member identifier search input",
+      "strategies": [
+        {
+          "kind": "accessibility",
+          "role": "textbox",
+          "name": "Member ID",
+          "exact": true
+        },
+        {
+          "kind": "label",
+          "label": "Member ID",
+          "exact": true
+        }
+      ]
+    },
+    {
+      "id": "member-search-button",
+      "description": "Search action",
+      "strategies": [
+        {
+          "kind": "accessibility",
+          "role": "button",
+          "name": "Search",
+          "exact": true
+        },
+        {
+          "kind": "text",
+          "text": "Search",
+          "exact": true
+        }
+      ]
+    },
+    {
+      "id": "savings-balance-value",
+      "description": "Savings balance value on member detail",
+      "strategies": [
+        {
+          "kind": "relative",
+          "anchorText": "Savings",
+          "relation": "nearest",
+          "controlHint": "value",
+          "ordinal": 1
+        }
+      ]
+    },
+    {
+      "id": "member-not-found-message",
+      "description": "Member-not-found business message",
+      "strategies": [
+        {
+          "kind": "text",
+          "text": "Member not found",
+          "exact": true
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "fill-member-id",
+      "description": "Enter the requested member identifier.",
+      "risk": "read_only",
+      "action": "fill",
+      "targetId": "member-id-input",
+      "value": {
+        "source": "input",
+        "name": "member_id"
+      },
+      "clearFirst": true
+    },
+    {
+      "id": "search-member",
+      "description": "Submit the member lookup.",
+      "risk": "read_only",
+      "action": "click",
+      "targetId": "member-search-button",
+      "recoveryPolicyId": "transient-search-load",
+      "checkpoint": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "element_state",
+            "targetId": "savings-balance-value",
+            "state": "visible",
+            "timeoutMs": 10000
+          },
+          {
+            "kind": "element_state",
+            "targetId": "member-not-found-message",
+            "state": "visible",
+            "timeoutMs": 10000
+          }
+        ]
+      }
+    },
+    {
+      "id": "extract-savings-balance",
+      "description": "Extract the visible savings balance.",
+      "risk": "read_only",
+      "action": "extract",
+      "targetId": "savings-balance-value",
+      "outputName": "savings_balance",
+      "extraction": "text",
+      "transform": "currency_to_number"
+    }
+  ],
+  "businessOutcomes": [
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "description": "The lookup completed successfully but the application reports no matching member.",
+      "when": {
+        "kind": "element_state",
+        "targetId": "member-not-found-message",
+        "state": "visible",
+        "timeoutMs": 1000
+      }
+    }
+  ],
+  "recoveryPolicies": [
+    {
+      "id": "transient-search-load",
+      "appliesTo": ["timeout", "transient_load"],
+      "maxAttempts": 2,
+      "backoffMs": 500
+    }
+  ],
+  "successCondition": {
+    "kind": "output",
+    "outputName": "savings_balance",
+    "operator": "defined",
+    "timeoutMs": 1000
+  },
+  "policy": {
+    "allowedOrigins": ["http://127.0.0.1:3000"],
+    "allowedPathPatterns": ["/member-search", "/members/*"],
+    "allowedActions": ["click", "fill", "wait", "extract"],
+    "irreversibleActionPolicy": "require_human"
+  },
+  "provenance": {
+    "discoveryRunId": "fixture-not-a-real-discovery-run",
+    "createdAt": "2026-09-27T18:00:00.000Z",
+    "compilerVersion": "0.1.0"
+  }
+}
