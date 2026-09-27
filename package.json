@@ -1,0 +1,22 @@
+{
+  "name": "interface-ai-computer-use-automation",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Take-home implementation for a discover-once, deterministic-replay computer-use automation system.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
