@@ -39,3 +39,16 @@ document navigation, the guard blocks and latches it; reacquisition fails rather
 an invalid session. Explicit handoff disposal still closes/releases that session. A previously
 returned intervention result is not retroactively rewritten and no monitoring console is provided.
 Automation-originated allowlist violations return `failure/policy_violation`, not intervention.
+
+## Discovery handoff
+
+Discovery uses the same adapter ownership model. `request_human`, an unexpected visible dialog,
+or a policy decision of `require_human` creates an InterventionRequest and retains the live
+session, handle and normalized run. `DiscoveryCoordinator.getHandoff(id)` returns a snapshot;
+`releaseHandoff(id)` explicitly closes it. There is no automatic resumption or implied approval.
+
+Ephemeral observation refs are cleared on transfer and cannot be reused after reacquisition.
+Ownership is revoked before asynchronous handle disposal. Browser-backed tests verify the same
+page identity, automation rejection under human ownership and epochs 2→4 on return. Raw run context
+includes screenshots/input values and must be treated as sensitive. The library retains it; the
+headless `npm run discover` smoke CLI has no operator UI and explicitly releases any handoff.

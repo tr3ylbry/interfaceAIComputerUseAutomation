@@ -27,3 +27,8 @@ The Playwright implementation repeatedly leaks browser-specific concepts into ca
 The first adapter implemented navigation, observation, ordered target resolution, click/fill/select/read,
 checkpoints, evidence, lifecycle, and same-session handoff without adding Playwright types to the core
 contracts. Opaque runtime references were sufficient. The decision remains accepted.
+
+Discovery later exposed a missing perception-to-action seam: the lightweight observation refs
+were descriptive, not actionable, and did not carry screenshot bytes or verified durable control
+evidence. ADR-008 adds opt-in hybrid observations and `describeTarget(ref)` without provider or
+Playwright types. Replay keeps its lightweight path and ordered descriptor resolution unchanged.

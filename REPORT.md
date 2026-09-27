@@ -3,7 +3,11 @@
 Generic deterministic replay in `src/replay/` reads a saved capability, validates inputs and
 references, opens a SurfaceAdapter session, binds values, executes ordered steps and returns a
 validated ReplayResult. Playwright stays inside its adapter. The demo's saved artifact reads fake
-member 12345's savings balance as 4321.09. Discovery and compilation are not implemented.
+member 12345's savings balance as 4321.09. Bounded discovery and compilation now exist in
+`src/discovery/`, with an isolated OpenAI Responses adapter configured for gpt-6-astra. Each turn
+combines a live screenshot and compact semantic snapshot and proposes one strict tool action.
+**No genuine API discovery has yet run: credentials were unavailable.** Scripted-model browser
+tests prove compilation followed by fresh model-free replay for member 67890, returning 8765.43.
 
 # 2. Artifact schema
 
@@ -11,6 +15,10 @@ The JSON artifact declares inputs, outputs, ordered steps, logical targets with 
 checkpoints, business outcomes, recovery budgets, and safety policy. Schema 1.1 adds checkpoint-based
 runtime conditions for failures, recoverable states, and intervention. Version 1.0 artifacts without
 conditions still validate. The fixture is manually authored, not evidence of an LLM discovery run.
+The compiler instead consumes normalized, verified DiscoveryRun evidence, derives targets from
+adapter-verified controls, replaces caller-declared discovery values with input references, and
+emits a draft with provenance and output/source checkpoints. Ephemeral refs and raw transcripts do
+not enter the artifact. Undemonstrated business/recovery conditions are not invented.
 
 # 3. Determinism & error handling
 
@@ -48,13 +56,22 @@ This is navigation enforcement, not a general outbound-data sandbox. Raw evidenc
 is disabled by default in replay and enabled for the fake-data demo. It is unredacted and ignored
 by Git. Events omit invocation values and raw browser errors; returned outputs and handoff context
 remain sensitive caller-owned data.
+Discovery reuses these boundaries. Unknown clicks require review or are blocked; known inquiry
+permissions come from the caller, never the model. Fills/selects accept only declared values.
+Screenshots are raw and model processing needs explicit caller consent. Responses uses `store: false`
+and disables parallel calls; this does not promise zero provider retention. Model refusals, invalid
+decisions, deadlines and step exhaustion stop rather than trigger hidden retries.
 
 # 7. Cuts
 
-No LLM provider, discovery loop, compiler, operator console, queue, database, remote API, desktop
-adapter, or tenant override engine is implemented. Recovery supports declared dismiss clicks and
+No operator console, queue, database, application service API, desktop adapter, or tenant override
+engine is implemented. Recovery supports declared dismiss clicks and
 checkpoint rechecks. Automatic continuation, production redaction, authenticated artifact approval,
 and broader outbound-data restrictions remain gaps. Chromium protocol dependence, unsupported
 auxiliary pages/service workers, and unguarded non-document/browser-internal traffic limit the
-safety claim. The next task is to specify discovery inputs, approval boundaries and provider
-requirements before selecting a provider or implementing a model-driven loop.
+safety claim. Discovery is semantic-only (no coordinate fallback); current compilation supports
+linear successful paths and exact scalar input substitution, not arbitrary value interpolation or
+branch discovery. A typed value read from a live source is necessary, but does not prove that an LLM
+selected the semantically correct account. The next task is to supply credentials and run the
+explicit real discovery → compile → different-member replay integration once, inspect the result,
+and preserve a safe evidence bundle. Until then the central live-LLM acceptance proof remains open.

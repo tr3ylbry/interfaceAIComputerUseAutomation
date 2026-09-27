@@ -29,6 +29,51 @@ Events contain IDs and statuses rather than caller values or raw exception messa
 is opt-in and remains unredacted. Return values and handoff context intentionally carry invocation
 data in memory. Production persistence requires a separate redaction/retention design.
 
+## Discovery enforcement and model data
+
+The model is an untrusted proposer, never a browser operator. Seven strict function tools accept
+current observation refs or an explicit URL, not selectors, coordinates, scripts, shell commands
+or arbitrary code. Parallel calls are disabled and multiple returned calls are rejected before any
+execution. Independent runtime schema validation remains necessary even with provider strict mode.
+
+Every proposal passes argument validation, risk classification and existing action/location policy
+before execute. A runtime policy hook may further restrict approval. Unknown clicks conservatively
+carry irreversible-write risk: policy either blocks or transfers the same session to a human.
+The caller may authorize known inquiry controls by exact semantic role/name and current path.
+Those unordered permissions are application trust configuration, not workflow steps or a general
+proof that similarly named controls are harmless. Adversarial applications could spoof semantics;
+this slice is for the configured controlled target, not arbitrary hostile websites.
+
+Fill/select values must match explicitly authorized discovery inputs exactly. They are reversible
+interactions only within the configured surface; no arbitrary model-supplied literals are entered.
+Read and in-policy navigation remain read-only. A route allowlist is not server-side transaction
+authorization. All implicit document requests still pass the pre-egress guard; a model-driven
+click cannot weaken it. Visible dialogs pause before another model call. The coordinator never
+treats a categorical allowlist violation as an opportunity for approval.
+
+Observation refs bind to exact nodes and expire on re-observation, any action or handoff. The adapter
+rejects changed control semantics rather than silently retargeting an old index. Automation ownership
+is revoked synchronously before asynchronous handoff cleanup. These checks reduce stale-state risk,
+but are not an atomic transaction with application-side DOM/server mutations.
+
+The caller must approve model processing. Screenshots and compact observations can expose input,
+output, URL and other visible data; `sensitive: true` is metadata, not automatic redaction. Password
+field values are omitted from the structured projection, but screenshots are not scrubbed. Use only
+fake data for this integration. UI content is explicitly treated as untrusted in the model prompt;
+independent policy remains the enforcement boundary against prompt injection.
+
+The key stays in the environment/ignored env file and the provider's Authorization header. The
+Responses client has a fixed HTTPS endpoint and refuses redirects; it does not record provider
+error bodies or hidden reasoning. `store: false` disables Responses storage, not every possible
+provider retention mechanism. Review provider data controls before processing real customer data.
+
+DiscoveryRun is an **unredacted in-memory record**, including concrete values and observations.
+The explicit integration CLI persists raw records/screenshots with restrictive file permissions
+inside ignored `evidence/runtime/discovery/`. Its sanitized tool summary contains only IDs, action
+names, policy outcomes and execution flags. This selective summary is not a general redactor.
+The compiler filters concrete input/output values and refuses unsafe normalization; generated
+artifacts remain drafts. Provenance and draft approval are not signed/authenticated attestations.
+
 ## Navigation request invariant
 
 “No browser request capable of moving the automated session outside its allowed navigation surface

@@ -6,19 +6,77 @@ The model discovers. The artifact becomes the reusable capability. Deterministic
 
 ## Primary components
 
-- **Discovery engine** — LLM-driven observe → decide → act loop.
-- **Artifact compiler** — converts successful discovery evidence into a normalized capability artifact.
+- **Discovery engine** — bounded observe → model proposal → policy → act loop, behind a DiscoveryModel seam.
+- **Artifact compiler** — converts verified discovery evidence into a schema-1.1 draft artifact.
 - **Replay engine** — binds invocation inputs and executes capability steps without an LLM decision loop.
 - **Surface adapter** — isolates perception/action mechanics from the artifact and replay contracts.
 - **Policy engine** — evaluates every proposed action before execution.
 - **Evidence recorder** — writes structured events plus richer failure evidence.
-- **Intervention coordinator** — pauses automation, transfers the same live session to a human, and safely resumes.
+- **Intervention coordinator** — pauses automation and transfers the same live session to a human; automatic continuation is not implemented.
 
 ## Dependency direction
 
 `discovery/replay -> core contracts -> surface adapter`
 
 Playwright-specific types must not appear in the serialized capability schema.
+
+## Typed discovery and provider boundary
+
+`src/discovery/contracts.ts` defines DiscoveryRequest, DiscoveryModel and normalized DiscoveryRun.
+The caller declares a goal, target, typed inputs with concrete discovery values, desired typed
+outputs, limits and policy/approval context. The model discovers **how**, not which literals should
+be parameters. `OpenAIDiscoveryModel` alone knows Responses HTTP objects. It sends stateless requests
+with `gpt-6-astra` (configurable), medium reasoning, `store: false`, strict tools and no parallel calls.
+Node fetch suffices for one endpoint; no SDK or runtime provider dependency was added to replay.
+
+Every model turn receives a current viewport PNG plus at most 120 compact visible elements from
+up to eight frames: ref, role/name/label, text, current non-password value, row context, visibility,
+enabled state and bounds. The semantic projection is deliberately approximate, not a complete
+accessibility tree. Large/raw DOM and browser objects are not sent. Ref lifetimes end on a new
+observation, action or handoff. The adapter pins each ref to its exact node and checks semantic
+freshness; a replacement node cannot inherit an index-based action by accident.
+
+SurfaceAdapter gained optional opt-in image observation and `describeTarget(ref)` because replay
+refs alone could neither identify observed controls for action nor prove durable locator evidence.
+The adapter verifies candidate accessibility, label, relative-text, text and structural strategies
+against the same control, with frame scope. No selectors or coordinates are model tools. ADR-008
+records this implementation-driven extension; artifact/replay result schemas are unchanged.
+
+The seven tools are `ui_click`, `ui_fill`, `ui_select`, `ui_navigate`, `ui_read`, `finish_discovery`
+and `request_human`. The coordinator accepts exactly one schema-validated decision, independently
+classifies risk, evaluates existing policy plus optional restrictive runtime policy, executes,
+records and observes again. Time and decision budgets include finish; there are no action retries.
+The existing navigation guard is installed before opening. Every actual execute call is approved.
+
+The DiscoveryRun retains caller contract, model identity, ordered decisions/actions, semantic
+control snapshots, verified targets, policy decisions, before/after observation IDs, typed output
+candidates and finish checks. Provider transcripts/hidden reasoning are not executable records.
+Explicit finish requires required typed outputs from real reads and live source equality checks.
+This verifies extraction and source continuity, not arbitrary natural-language goal correctness;
+draft review remains necessary if the model selected the wrong semantic source.
+
+## Evidence-to-artifact compiler
+
+`compileDiscovery` is deterministic and accepts only a successful, verified run. It preserves
+executed action order, substitutes exact declared input values with input ValueExpressions,
+filters value-dependent locators, and emits targets derived only from adapter-verified evidence.
+The next acted-on control supplies a visible-state checkpoint. Final success checks require bound
+outputs and their visible sources, not equality to a fixed discovery balance. Replay still owns
+runtime output values and output checkpoints.
+
+Artifacts omit ephemeral refs, concrete discovery values, screenshots, goal literals and model
+transcripts; provenance retains the discovery run ID and compiler version. Ambiguous bindings,
+embedded-value interpolation and missing value-independent strategies fail rather than guessing.
+The conservative whole-artifact value scan can reject benign short/common values. Boolean output
+extraction, general branching and conditional recovery compilation are deliberately unsupported.
+Happy-path runs emit no business/recovery/runtime-condition declarations because none were
+demonstrated; the existing manually authored example continues to test those replay semantics.
+
+`run-discovery.ts` uses no saved capability as input. On real completion it saves a draft and invokes
+the existing generic replay on a fresh session with another fake member. Offline browser tests
+prove this pipeline with a scripted model (12345 → 4321.09, then 67890 → 8765.43, zero replay model
+calls). The real provider request/decision path is implemented but not integration-verified without
+credentials. No live discovery artifact or run is claimed.
 
 ## Implemented vertical slice
 
@@ -109,10 +167,14 @@ old target references; target resolution detects ownership changes across awaits
 6. Legitimate business outcomes are not flattened into automation failures.
 7. Recoverable conditions use bounded policies and remain observable in the run log.
 8. Only one actor owns the live session at a time.
-9. Artifacts and logs must not persist secrets or raw sensitive data.
+9. Executable artifacts exclude concrete discovery values; raw runtime records require an explicit protected evidence boundary.
 10. Managed HTTP(S) document navigation is policy-gated before request egress, including redirects.
 
 Raw adapter evidence is accurately marked `redacted: false`. The demo uses fake data, stores
 runtime evidence under an ignored directory, and does not claim redaction that has not occurred.
 Generic replay requires explicit opt-in to capture it. Logs omit raw input/output values and
 browser exception text; callers remain responsible for protecting returned outputs and handoffs.
+Discovery is intentionally different: its in-memory observations/run contain raw declared data.
+Explicit model-processing consent is required. Only the fake-data integration CLI persists these
+records, under ignored `evidence/runtime/discovery/`, marked `redacted: false`; it also produces a
+value-free tool summary. This is not a general redactor or a claim of provider zero retention.

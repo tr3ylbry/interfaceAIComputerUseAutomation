@@ -25,7 +25,7 @@ export function matchesType(value: unknown, type: ValueType): value is JsonValue
   }
 }
 
-export function validateInputs(artifact: CapabilityArtifact, supplied: unknown): Record<string, JsonValue> {
+export function validateInputs(artifact: Pick<CapabilityArtifact, "inputs">, supplied: unknown): Record<string, JsonValue> {
   if (!supplied || typeof supplied !== "object" || Array.isArray(supplied)) throw new Error("Inputs must be an object");
   const inputs = supplied as Record<string, unknown>;
   if (Object.keys(inputs).some((key) => !artifact.inputs.some((input) => input.name === key))) {

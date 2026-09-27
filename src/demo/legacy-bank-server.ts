@@ -24,6 +24,11 @@ const VALID_SCENARIOS = new Set<LegacyBankScenario>([
   "intervention",
 ]);
 
+const MEMBERS: Record<string, { name: string; savings: string }> = {
+  "12345": { name: "Jordan Example", savings: "$4,321.09" },
+  "67890": { name: "Casey Sample", savings: "$8,765.43" },
+};
+
 export async function startLegacyBankServer(
   options: { port?: number; host?: string } = {},
 ): Promise<LegacyBankServer> {
@@ -47,7 +52,7 @@ export async function startLegacyBankServer(
         sendHtml(response, 403, permissionDeniedPage());
         return;
       }
-      if (scenario === "not-found" || memberId !== "12345") {
+      if (scenario === "not-found" || !Object.hasOwn(MEMBERS, memberId)) {
         sendHtml(response, 200, memberNotFoundPage(memberId));
         return;
       }
@@ -55,17 +60,19 @@ export async function startLegacyBankServer(
         sendHtml(response, 503, busyInterstitialPage(memberId, scenario));
         return;
       }
-      sendHtml(response, 200, memberDetailPage(scenario));
+      sendHtml(response, 200, memberDetailPage(scenario, memberId));
       return;
     }
 
-    if (url.pathname === "/members/12345/accounts") {
-      sendHtml(response, 200, accountsPage(scenario));
+    const accountMember = /^\/members\/(\d+)\/accounts$/.exec(url.pathname)?.[1];
+    if (accountMember && Object.hasOwn(MEMBERS, accountMember)) {
+      sendHtml(response, 200, accountsPage(scenario, accountMember));
       return;
     }
 
-    if (url.pathname === "/frames/accounts/12345") {
-      sendHtml(response, 200, accountFrame());
+    const frameMember = /^\/frames\/accounts\/(\d+)$/.exec(url.pathname)?.[1];
+    if (frameMember && Object.hasOwn(MEMBERS, frameMember)) {
+      sendHtml(response, 200, accountFrame(frameMember));
       return;
     }
 
@@ -144,7 +151,7 @@ function permissionDeniedPage(): string {
   );
 }
 
-function memberDetailPage(scenario: LegacyBankScenario): string {
+function memberDetailPage(scenario: LegacyBankScenario, memberId: string): string {
   const dialog =
     scenario === "intervention"
       ? `<dialog open aria-label="Unexpected account warning">
@@ -157,30 +164,30 @@ function memberDetailPage(scenario: LegacyBankScenario): string {
     "Member Detail",
     `${dialog}
      <table class="detail-grid" border="1" cellspacing="0" cellpadding="5">
-       <tr><td>Member Number</td><td>12345</td></tr>
-       <tr><td>Name</td><td>Jordan Example</td></tr>
+       <tr><td>Member Number</td><td>${memberId}</td></tr>
+       <tr><td>Name</td><td>${MEMBERS[memberId]!.name}</td></tr>
        <tr><td>Status</td><td>Active</td></tr>
      </table>
-     <p><a href="/members/12345/accounts?scenario=${escapeHtml(scenario)}">Account Information</a></p>`,
+     <p><a href="/members/${memberId}/accounts?scenario=${escapeHtml(scenario)}">Account Information</a></p>`,
   );
 }
 
-function accountsPage(scenario: LegacyBankScenario): string {
+function accountsPage(scenario: LegacyBankScenario, memberId: string): string {
   return layout(
     "Account Information",
     `<h2>Account Information</h2>
-     <p>Member: 12345</p>
-     <iframe name="accountPane" src="/frames/accounts/12345?scenario=${escapeHtml(scenario)}"></iframe>`,
+     <p>Member: ${memberId}</p>
+     <iframe name="accountPane" src="/frames/accounts/${memberId}?scenario=${escapeHtml(scenario)}"></iframe>`,
   );
 }
 
-function accountFrame(): string {
+function accountFrame(memberId: string): string {
   return `<!doctype html>
   <html><head><meta charset="utf-8"><title>Accounts</title><style>${styles()}</style></head>
   <body>
     <table class="accounts" border="1" cellspacing="0" cellpadding="5">
       <tr><th>Type</th><th>Available Balance</th></tr>
-      <tr><td>Savings</td><td><span class="balance-value">$4,321.09</span></td></tr>
+      <tr><td>Savings</td><td><span class="balance-value">${MEMBERS[memberId]!.savings}</span></td></tr>
       <tr><td>Checking</td><td><span class="balance-value">$918.44</span></td></tr>
     </table>
   </body></html>`;

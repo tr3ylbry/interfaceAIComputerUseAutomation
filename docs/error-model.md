@@ -60,3 +60,30 @@ recovery-attempt indicator and evidence status. An opening denial has no step or
 the adapter disposes of the failed opening. Evidence capture remains optional and may be unavailable.
 Late denials detected at cleanup replace an otherwise successful result with `policy_violation`.
 No automatic retry or allowlist override follows a denial.
+
+## Discovery termination (separate from ReplayResult)
+
+Discovery returns a normalized run with `success`, `failure` or `intervention_required`. Invalid
+caller requests throw `DiscoveryError/invalid_request` before opening; runtime failures carry a
+stable code and the decisions, observations, policy outcomes and last attempted action accumulated
+so far. The run is raw/sensitive; safe console messages use codes, not browser/provider exceptions.
+
+- `success`: explicit finish, required typed read outputs and matching live-source checks. A text
+  claim or a finish without extraction yields `success_unverified`.
+- `policy_violation`: blocked proposal or navigation guard denial; no automatic approval/retry.
+- `intervention_required`: explicit model request, unexpected visible dialog, or permitted-surface
+  action whose risk requires confirmation. The proposed action is not executed; the same session
+  remains under human ownership with its run context.
+- `max_steps` / `timeout`: bounded decision count or wall-clock deadline exhausted. Finish consumes
+  a turn. The model request is aborted, late replies cannot act, and sessions are disposed (including
+  late-open sessions). There is no automatic retry or hidden recovery loop.
+- `model_dead_end`, `model_incomplete`, `invalid_model_decision`, `provider_http_<status>`: refusal,
+  missing/multiple/invalid calls, incomplete output or provider failure. No raw HTTP body is logged.
+- `surface_error`, `invalid_output`, `cleanup_failed`, `discovery_error`: execution, extraction,
+  lifecycle or other unexpected errors. No failed run can compile.
+
+Compilation also fails closed for ambiguous input bindings, value-dependent-only targets,
+unsupported interpolation or concrete discovery values remaining in an artifact. It does not
+guess business outcomes or recovery declarations from missing targets. A happy-path generated
+artifact has none of those declarations; MEMBER_NOT_FOUND and host-busy remain proven replay
+features of the separately hand-authored fixture until branch discovery is implemented.

@@ -17,6 +17,8 @@ export const ObservationElementSchema = z.object({
   name: z.string().optional(),
   text: z.string().optional(),
   value: z.string().optional(),
+  label: z.string().optional(),
+  contextText: z.string().optional(),
   enabled: z.boolean().optional(),
   visible: z.boolean().optional(),
   bounds: z
@@ -30,12 +32,14 @@ export const ObservationElementSchema = z.object({
 });
 
 export const SurfaceObservationSchema = z.object({
+  id: IdentifierSchema.optional(),
   capturedAt: z.string().datetime(),
   urlOrLocation: z.string().optional(),
   title: z.string().optional(),
   elements: z.array(ObservationElementSchema).default([]),
   textSummary: z.string().optional(),
   screenshotPath: z.string().optional(),
+  image: z.object({ mimeType: z.literal("image/png"), base64: z.string().min(1), redacted: z.literal(false) }).optional(),
 });
 
 export type SurfaceObservation = z.infer<typeof SurfaceObservationSchema>;
@@ -108,7 +112,10 @@ export interface SurfaceAdapter {
 
   open(target: SurfaceTarget, options?: SurfaceOpenOptions): Promise<SurfaceSession>;
 
-  observe(session: SurfaceSession): Promise<SurfaceObservation>;
+  observe(session: SurfaceSession, options?: { discovery: boolean }): Promise<SurfaceObservation>;
+
+  /** Derive and verify durable strategies for a current observation ref, without acting. */
+  describeTarget?(session: SurfaceSession, ref: Identifier): Promise<TargetDescriptor>;
 
   resolveTarget(
     session: SurfaceSession,

@@ -161,3 +161,78 @@ redaction, signed approval, automatic continuation or discovery integration was 
 Next: define the discovery input/output and approval contract, enumerate provider requirements,
 and obtain an explicit provider choice before implementing a model-driven loop. Re-run these
 counter tests after any browser upgrade or expansion of the supported surface.
+
+## 2026-09-27 — Bounded discovery, provider seam and artifact compilation
+
+### Goal and implementation
+
+Implement real-provider-capable discovery without changing deterministic replay into an agent.
+The caller explicitly selected OpenAI Responses / gpt-6-astra, strict direct function tools,
+`store: false` and disabled parallel calls. Added `src/discovery/` contracts, model seam, Responses
+client, coordinator, conservative policy classification, compiler and explicit evidence writer;
+opt-in hybrid browser observations; caller-contract and integration CLI files; and focused tests.
+No new dependency, service, native computer tool, script execution tool or operator UI was added.
+
+### Findings and decisions
+
+- Caller-declared typed inputs/outputs avoid asking the model to infer parameterization from
+  arbitrary literals. Discovery values stay in the raw run; compilation substitutes exact input
+  references. Ambiguous/embedded values fail closed. The emitted artifact is a draft.
+- Existing replay observation refs could not act on observed controls or provide verified durable
+  target evidence. ADR-008 adds optional screenshot observation and `describeTarget(ref)` to the
+  generic surface contract, not browser/provider objects or an artifact schema revision.
+- Each screenshot-backed turn proposes one strict action. Policy precedes every execute; unknown
+  clicks require review or block, while configured inquiry permissions authorize known read-only
+  controls. A model cannot assign its own risk class. Existing pre-request confinement stays active.
+- Raw DOM snapshots were rejected as model input. A compact semantic inventory plus live PNG keeps
+  precise refs and visual context, with current caps of eight frames and 120 visible elements.
+- Exact element handles avoid retargeting stale indexes. Comparing outerHTML was too brittle under
+  browser instrumentation; semantic/action-bearing fields now supply freshness checks. A concurrent
+  full-suite run also exposed a one-millisecond final verification timeout; the bounded source read
+  now has up to one second within the run deadline. These fixes do not retry UI actions.
+- Handoff gained asynchronous handle cleanup. Review caught the ownership gap this could create;
+  ownership now changes before that await, and action exclusion extends through ref disposal.
+- The compiler accepts only verified executed actions, derives ordered targets from adapter
+  evidence, filters value-dependent locators and creates output/source checkpoints. A successful
+  happy path demonstrates no not-found/busy/denial branches, so none are invented or copied from
+  the hand-authored artifact. Replay output ownership and event/result semantics stay unchanged.
+- The proxy originally had only one valid member. Added a second fake member (67890, balance 8765.43)
+  without changing its deliberately imperfect markup, making different-input replay observable.
+- Node fetch isolates one Responses endpoint without adding an SDK. Tests assert request flags,
+  strict schemas, screenshot input, one-call validation and safe provider error codes. Actual API
+  acceptance and the model's ability to choose this workflow remain unverified without credentials.
+
+### Validation and evidence
+
+`npm run typecheck` and all **126 tests** pass: the existing 89 plus 37 discovery tests (26 coordinator/
+compiler/evidence cases, eight mocked-provider cases, three real-browser/scripted-model cases).
+The existing `npm run demo` also returned success with savings balance 4321.09 after the changes.
+The scripted browser path is fill → Search → Account Information → read → explicit finish.
+It compiles observed controls, serializes the artifact and replays it in a fresh browser for member
+67890, returning 8765.43 with zero additional model calls. Same-session handoff and stale refs are
+tested. Existing six replay scenarios and navigation zero-forbidden-hit tests remain green.
+
+No OPENAI_API_KEY was available in the environment or local env files. `npm run discover` builds
+then exits explicitly for missing credentials before any API/browser work. **No genuine model
+discovery, live discovery sequence, saved live artifact or API success is claimed.** The integration
+command is ready to perform one real attempt and preserve raw/sanitized evidence separately under
+ignored `evidence/runtime/discovery/<run-id>/`. The example capability remains hand-authored.
+
+README, REPORT, architecture, safety/error/handoff docs, evidence README, ADR-002/004 and new ADR-008
+now distinguish implemented/offline-tested behavior from pending live evidence. Private interview
+notes stay local and ignored. Model messages/hidden reasoning do not become executable artifacts;
+the minimal sanitized trace is not a production screenshot/log redactor.
+The Notion provider task is complete; discovery/compiler acceptance remains in progress with the
+credential dependency recorded. Its journal, decision log and private defense guide are synchronized.
+
+### Deliberate limits and next task
+
+Semantic refs only; no coordinates, automatic human continuation, arbitrary interpolation, boolean
+output transform, branch learning or signed approval. Success verifies typed reads and source
+continuity, not universal semantic goal correctness. Caller inquiry rules assume a trusted configured
+application, and the navigation boundary is not general data-loss prevention. Raw model processing
+requires consent; `store: false` does not establish provider zero retention.
+
+Next: supply OPENAI_API_KEY securely, run `npm run discover` once, inspect the model-chosen actions
+and emitted draft, verify the fresh 67890 replay/model-call delta, then publish only reviewed safe
+evidence and update these claims from that real run. Do not replace this proof with the scripted test.

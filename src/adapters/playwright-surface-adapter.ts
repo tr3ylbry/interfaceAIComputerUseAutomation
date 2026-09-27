@@ -30,6 +30,7 @@ import type {
 } from "../contracts/index.js";
 import { NavigationPolicyError } from "../contracts/index.js";
 import { NavigationFirewall } from "./navigation-firewall.js";
+import { DiscoveryObservation } from "./discovery-observation.js";
 
 type ControlOwner = "automation" | "human" | "none";
 type ControlPhase =
@@ -59,6 +60,7 @@ type PlaywrightSessionState = {
   traceActive: boolean;
   actionInFlight: boolean;
   navigation: NavigationFirewall | undefined;
+  discovery: DiscoveryObservation;
 };
 
 type LocatorRoot = {
@@ -143,6 +145,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
         traceActive: true,
         actionInFlight: false,
         navigation,
+        discovery: new DiscoveryObservation(page, this.actionTimeoutMs),
       };
       this.sessions.set(session.id, state);
       return session;
@@ -153,10 +156,34 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     }
   }
 
-  async observe(session: SurfaceSession): Promise<SurfaceObservation> {
+  async observe(session: SurfaceSession, options?: { discovery: boolean }): Promise<SurfaceObservation> {
     const state = this.getState(session);
-    try { return await this.observePage(session); }
+    try {
+      if (options?.discovery) {
+        this.getAutomationState(session);
+        const epoch = state.epoch;
+        if (state.actionInFlight) throw new PlaywrightSurfaceError("session_busy", "Action is in flight");
+        const observation = await state.discovery.observe();
+        if (state.epoch !== epoch) {
+          await state.discovery.clear();
+          throw new PlaywrightSurfaceError("stale_operation", "Control changed during observation");
+        }
+        return observation;
+      }
+      return await this.observePage(session);
+    }
     finally { state.navigation?.assertAllowed(); }
+  }
+
+  async describeTarget(session: SurfaceSession, ref: string): Promise<TargetDescriptor> {
+    const state = this.getAutomationState(session);
+    const epoch = state.epoch;
+    try {
+      const descriptor = await state.discovery.describe(ref, descriptor =>
+        this.locatorForStrategy(this.rootForDescriptor(state.page, descriptor), descriptor.strategies[0]! as Exclude<LocatorStrategy, { kind: "coordinate" }>));
+      if (state.epoch !== epoch) throw new PlaywrightSurfaceError("stale_operation", "Control changed");
+      return descriptor;
+    } finally { state.navigation?.assertAllowed(); }
   }
 
   private async observePage(session: SurfaceSession): Promise<SurfaceObservation> {
@@ -265,6 +292,8 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
         return { ok: true, observedState: { url: state.page.url() } };
       }
 
+      if (state.discovery.has(action.targetRef)) return await state.discovery.execute(action);
+
       const target = state.targetsByRef.get(action.targetRef);
       if (!target) {
         throw new PlaywrightSurfaceError(
@@ -323,7 +352,8 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     } catch (error) {
       return this.actionError(error);
     } finally {
-      state.actionInFlight = false;
+      try { await state.discovery.clear(); }
+      finally { state.actionInFlight = false; }
       state.navigation?.assertAllowed();
     }
   }
@@ -416,9 +446,11 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
   ): Promise<HumanControlHandle> {
     const state = this.getAutomationState(session);
     if (state.actionInFlight) throw new PlaywrightSurfaceError("session_busy", "Cannot transfer control during an action");
+    // Revoke automation synchronously, before disposing handles across an await.
+    this.transition(state, "paused_for_intervention", "none");
+    await state.discovery.clear();
     state.targetsByRef.clear();
     state.targetRefsById.clear();
-    this.transition(state, "paused_for_intervention", "none");
     state.interventionId = interventionId;
     this.transition(state, "human_control", "human");
     return {
