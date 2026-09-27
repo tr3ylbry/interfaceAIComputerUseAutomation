@@ -1,6 +1,6 @@
 # ADR-006: Artifact-driven replay and declared runtime conditions
 
-**Status:** Accepted
+**Status:** Accepted. The post-navigation-only safety limitation below is superseded by ADR-007.
 
 ## Context
 

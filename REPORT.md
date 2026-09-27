@@ -40,8 +40,11 @@ reacquisition only. Human action recording and automatic continuation are unimpl
 
 Policy precedes opening and every execute call, including recovery. It constrains exact origins,
 anchored path patterns, action kinds and risk; irreversible actions block or require review. Runtime
-policy may further restrict approval. Explicit navigation is checked before execution; implicit
-form/link navigation is checked afterward, so this is not browser egress enforcement. Raw evidence
+policy may further restrict action approval. Explicit navigation is checked before execution;
+Chromium document requests from links, forms, scripts, frames and redirect chains are intercepted
+before egress. Instrumented tests verify zero requests at forbidden destinations, including
+same-origin forbidden paths and cross-site frame redirects. Ordinary subresources are not blocked.
+This is navigation enforcement, not a general outbound-data sandbox. Raw evidence
 is disabled by default in replay and enabled for the fake-data demo. It is unredacted and ignored
 by Git. Events omit invocation values and raw browser errors; returned outputs and handoff context
 remain sensitive caller-owned data.
@@ -51,5 +54,7 @@ remain sensitive caller-owned data.
 No LLM provider, discovery loop, compiler, operator console, queue, database, remote API, desktop
 adapter, or tenant override engine is implemented. Recovery supports declared dismiss clicks and
 checkpoint rechecks. Automatic continuation, production redaction, authenticated artifact approval,
-and browser network restrictions remain gaps. The next task is navigation policy enforcement for
-links, forms and redirects before introducing discovery.
+and broader outbound-data restrictions remain gaps. Chromium protocol dependence, unsupported
+auxiliary pages/service workers, and unguarded non-document/browser-internal traffic limit the
+safety claim. The next task is to specify discovery inputs, approval boundaries and provider
+requirements before selecting a provider or implementing a model-driven loop.

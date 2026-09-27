@@ -2,12 +2,13 @@ import { randomUUID } from "node:crypto";
 import { setTimeout as delay } from "node:timers/promises";
 import {
   CapabilityArtifactSchema, InterventionRequestSchema, ReplayResultSchema,
+  NavigationPolicyError,
   type CapabilityArtifact, type CapabilityStep, type Checkpoint, type EvidenceRef,
   type HumanControlHandle, type InterventionRequest, type JsonValue, type ReplayEvent,
   type ReplayResult, type SurfaceAction, type SurfaceAdapter, type SurfaceRuntimeContext,
   type SurfaceSession,
 } from "../contracts/index.js";
-import { evaluatePolicy, locationAllowed, type PolicyEvaluator, type PolicyRequest } from "./policy.js";
+import { evaluatePolicy, evaluateNavigation, locationAllowed, type PolicyEvaluator, type PolicyRequest } from "./policy.js";
 import { bind, equalValues, matchesType, scalar, transform, validateInputs } from "./values.js";
 import { validateReferences } from "./validation.js";
 
@@ -63,7 +64,8 @@ export class ReplayCoordinator {
   async releaseHandoff(interventionId: string): Promise<void> {
     const handoff = this.handoffs.get(interventionId);
     if (!handoff) throw new Error("Unknown intervention");
-    await this.adapter.close(handoff.session);
+    try { await this.adapter.close(handoff.session); }
+    catch (error) { if (!(error instanceof NavigationPolicyError)) throw error; }
     this.handoffs.delete(interventionId);
   }
 }
@@ -99,7 +101,12 @@ class Invocation {
       }
       if (this.adapter.kind !== this.artifact.target.surfaceKind) this.fail("surface_error", "Surface kind mismatch");
       await this.approve({ action: "open", risk: "read_only", location: this.artifact.target.entryPoint });
-      this.session = await this.adapter.open(this.artifact.target);
+      if (this.adapter.kind === "web" && !this.adapter.supportsNavigationGuard) {
+        this.fail("policy_violation", "Adapter cannot enforce navigation policy before requests");
+      }
+      this.session = await this.adapter.open(this.artifact.target, {
+        navigationGuard: (source, destination) => evaluateNavigation(this.artifact.policy, source, destination),
+      });
       for (const step of this.artifact.steps) {
         this.stepId = step.id;
         this.emit({ type: "step_started", at: this.now(), stepId: step.id });
@@ -117,7 +124,7 @@ class Invocation {
       }
       terminal = { status: "success", outputs: this.context.outputs };
     } catch (error) {
-      terminal = error instanceof Stop ? error.terminal : {
+      terminal = error instanceof NavigationPolicyError ? this.navigationFailure(error) : error instanceof Stop ? error.terminal : {
         status: "failure", code: error instanceof Recover ? "recovery_exhausted" : "surface_error",
         message: error instanceof Recover ? "No eligible recovery policy for observed condition" : "Replay operation failed",
       };
@@ -131,8 +138,10 @@ class Invocation {
     }
     if (this.session && !this.transferred) {
       try { await this.adapter.close(this.session); }
-      catch {
-        if (terminal.status === "failure") terminal.message += "; session cleanup failed";
+      catch (error) {
+        if (error instanceof NavigationPolicyError) {
+          if (terminal.status !== "failure" || terminal.code !== "policy_violation") terminal = this.navigationFailure(error);
+        } else if (terminal.status === "failure") terminal.message += "; session cleanup failed";
         else terminal = { status: "failure", code: "surface_error", message: "Session cleanup failed" };
       }
     }
@@ -192,6 +201,17 @@ class Invocation {
     }
   }
 
+  private navigationFailure(error: NavigationPolicyError): Terminal {
+    try {
+      this.emit({ type: "policy_decision", at: this.now(), action: "navigate", decision: "block",
+        reason: error.reason, ...(this.stepId ? { stepId: this.stepId } : {}) });
+    } catch { /* A diagnostic sink cannot replace a known safety denial. The event is retained. */ }
+    return { status: "failure", code: "policy_violation", message: "Navigation blocked by policy",
+      expected: { navigation: "allowed_origin_and_path" },
+      observed: { source: error.source, destination: error.destination, reason: error.reason,
+        evidence: this.evidenceStatus, recoveryAttempted: this.events.some((event) => event.type === "recoverable_condition") } };
+  }
+
   private async perform(step: CapabilityStep): Promise<void> {
     const observation = await this.adapter.observe(this.session!);
     const destination = step.action === "navigate" ? scalar(bind(step.destination, this.context)) : undefined;
@@ -212,6 +232,9 @@ class Invocation {
     }
     const result = await this.adapter.execute(this.session!, action);
     if (!result.ok) {
+      if (result.error?.code === "policy_violation") {
+        this.fail("policy_violation", "Navigation blocked by policy", { action: step.action }, result.observedState);
+      }
       // A click timeout can occur after dispatch; never assume it is safe to repeat.
       if (result.error?.code === "permission_denied") this.fail("permission_denied", "Surface denied the action");
       this.fail("surface_error", "Surface action failed; execution state may be uncertain",

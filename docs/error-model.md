@@ -48,3 +48,15 @@ Declared hard/intervention guards take precedence over recoverable guards and bu
 Business outcomes are checked before the step checkpoint and before subsequent extraction. Missing
 business-message targets mean no matching outcome, not MEMBER_NOT_FOUND. Ordinary missing action
 targets fail with `target_not_found`.
+
+## Navigation policy violation
+
+A blocked document request is a categorical `failure/policy_violation`, not a recoverable network
+error or automatic intervention. The adapter aborts it before egress and latches the first denial.
+The generic NavigationPolicyError outranks incidental browser errors at observe, resolve, execute,
+checkpoint and cleanup boundaries. Replay emits a blocked `policy_decision` and returns the step
+when one is active, expected allowlist match, redacted source/destination origins, stable reason,
+recovery-attempt indicator and evidence status. An opening denial has no step or retained session;
+the adapter disposes of the failed opening. Evidence capture remains optional and may be unavailable.
+Late denials detected at cleanup replace an otherwise successful result with `policy_violation`.
+No automatic retry or allowlist override follows a denial.

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { Checkpoint, CheckpointEvaluation } from "./checkpoint.js";
 import { EvidenceRef, Identifier, IdentifierSchema, JsonValue, JsonValueSchema } from "./common.js";
 import { TargetDescriptor } from "./locator.js";
+import type { SurfaceOpenOptions } from "./navigation.js";
 
 export const SurfaceTargetSchema = z.object({
   surfaceKind: z.enum(["web", "desktop"]),
@@ -102,7 +103,10 @@ export type HumanControlHandle = {
 export interface SurfaceAdapter {
   readonly kind: "web" | "desktop";
 
-  open(target: SurfaceTarget): Promise<SurfaceSession>;
+  /** True only when the guard covers document requests, including frames and redirect hops. */
+  readonly supportsNavigationGuard?: boolean;
+
+  open(target: SurfaceTarget, options?: SurfaceOpenOptions): Promise<SurfaceSession>;
 
   observe(session: SurfaceSession): Promise<SurfaceObservation>;
 
@@ -136,6 +140,7 @@ export interface SurfaceAdapter {
     interventionId: Identifier,
   ): Promise<void>;
 
+  /** Dispose first, then report any latched NavigationPolicyError (including late denials). */
   close(session: SurfaceSession): Promise<void>;
 }
 

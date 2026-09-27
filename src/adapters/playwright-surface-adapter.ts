@@ -24,9 +24,12 @@ import type {
   SurfaceObservation,
   SurfaceSession,
   SurfaceTarget,
+  SurfaceOpenOptions,
   TargetDescriptor,
   ValueExpression,
 } from "../contracts/index.js";
+import { NavigationPolicyError } from "../contracts/index.js";
+import { NavigationFirewall } from "./navigation-firewall.js";
 
 type ControlOwner = "automation" | "human" | "none";
 type ControlPhase =
@@ -55,6 +58,7 @@ type PlaywrightSessionState = {
   controlHistory: Array<{ phase: ControlPhase; owner: ControlOwner; epoch: number }>;
   traceActive: boolean;
   actionInFlight: boolean;
+  navigation: NavigationFirewall | undefined;
 };
 
 type LocatorRoot = {
@@ -86,6 +90,7 @@ export class PlaywrightSurfaceError extends Error {
 
 export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
   readonly kind = "web" as const;
+  readonly supportsNavigationGuard = true;
 
   private readonly sessions = new Map<string, PlaywrightSessionState>();
   private readonly headless: boolean;
@@ -98,7 +103,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     this.actionTimeoutMs = options.actionTimeoutMs ?? 5_000;
   }
 
-  async open(target: SurfaceTarget): Promise<SurfaceSession> {
+  async open(target: SurfaceTarget, options: SurfaceOpenOptions = {}): Promise<SurfaceSession> {
     if (target.surfaceKind !== "web") {
       throw new PlaywrightSurfaceError(
         "unsupported_surface",
@@ -107,13 +112,20 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     }
 
     const browser = await chromium.launch({ headless: this.headless });
+    let navigation: NavigationFirewall | undefined;
     try {
-      const context = await browser.newContext();
+      const context = await browser.newContext({ serviceWorkers: "block" });
+      if (options.navigationGuard) {
+        navigation = new NavigationFirewall(context, target.entryPoint, options.navigationGuard);
+        await navigation.install();
+      }
       const page = await context.newPage();
+      await navigation?.protect(page);
       page.setDefaultTimeout(this.actionTimeoutMs);
       page.setDefaultNavigationTimeout(this.actionTimeoutMs);
       await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
       await page.goto(target.entryPoint, { waitUntil: "domcontentloaded" });
+      navigation?.assertAllowed();
 
       const session: SurfaceSession = { id: randomUUID(), kind: "web" };
       const state: PlaywrightSessionState = {
@@ -130,17 +142,26 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
         controlHistory: [{ phase: "automation_running", owner: "automation", epoch: 0 }],
         traceActive: true,
         actionInFlight: false,
+        navigation,
       };
       this.sessions.set(session.id, state);
       return session;
     } catch (error) {
       await browser.close().catch(() => undefined);
+      navigation?.assertAllowed();
       throw error;
     }
   }
 
   async observe(session: SurfaceSession): Promise<SurfaceObservation> {
     const state = this.getState(session);
+    try { return await this.observePage(session); }
+    finally { state.navigation?.assertAllowed(); }
+  }
+
+  private async observePage(session: SurfaceSession): Promise<SurfaceObservation> {
+    const state = this.getState(session);
+    state.navigation?.assertAllowed();
     const elements: SurfaceObservation["elements"] = [];
 
     for (const [frameIndex, frame] of state.page.frames().entries()) {
@@ -193,6 +214,12 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     session: SurfaceSession,
     descriptor: TargetDescriptor,
   ): Promise<ResolvedTarget> {
+    const state = this.getState(session);
+    try { return await this.resolvePageTarget(session, descriptor); }
+    finally { state.navigation?.assertAllowed(); }
+  }
+
+  private async resolvePageTarget(session: SurfaceSession, descriptor: TargetDescriptor): Promise<ResolvedTarget> {
     const state = this.getAutomationState(session);
     const epoch = state.epoch;
     const root = this.rootForDescriptor(state.page, descriptor);
@@ -234,7 +261,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     state.actionInFlight = true;
     try {
       if (action.kind === "navigate") {
-        await state.page.goto(action.destination, { waitUntil: "domcontentloaded" });
+        await state.page.goto(new URL(action.destination, state.page.url()).href, { waitUntil: "domcontentloaded" });
         return { ok: true, observedState: { url: state.page.url() } };
       }
 
@@ -292,10 +319,12 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
           };
         }
       }
+      throw new PlaywrightSurfaceError("unsupported_action", "Unsupported surface action");
     } catch (error) {
       return this.actionError(error);
     } finally {
       state.actionInFlight = false;
+      state.navigation?.assertAllowed();
     }
   }
 
@@ -303,10 +332,17 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     session: SurfaceSession,
     checkpoint: Checkpoint,
   ): Promise<CheckpointEvaluation> {
+    const state = this.getState(session);
+    try { return await this.evaluatePage(session, checkpoint); }
+    finally { state.navigation?.assertAllowed(); }
+  }
+
+  private async evaluatePage(session: SurfaceSession, checkpoint: Checkpoint): Promise<CheckpointEvaluation> {
     let state: PlaywrightSessionState;
     try {
       state = this.getAutomationState(session);
     } catch (error) {
+      if (error instanceof NavigationPolicyError) throw error;
       return { matched: false, message: this.errorMessage(error) };
     }
 
@@ -396,6 +432,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     interventionId: Identifier,
   ): Promise<void> {
     const state = this.getState(session);
+    state.navigation?.assertAllowed();
     if (state.phase !== "human_control" || state.owner !== "human") {
       throw new PlaywrightSurfaceError("invalid_control_state", "Session is not under human control");
     }
@@ -420,6 +457,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     this.transition(state, "closed", "none");
     await state.browser.close();
     this.sessions.delete(session.id);
+    state.navigation?.assertAllowed();
   }
 
   getSessionSnapshot(session: SurfaceSession): {
@@ -628,6 +666,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
 
   private getAutomationState(session: SurfaceSession): PlaywrightSessionState {
     const state = this.getState(session);
+    state.navigation?.assertAllowed();
     if (state.phase !== "automation_running" || state.owner !== "automation") {
       throw new PlaywrightSurfaceError(
         "session_not_owned",
@@ -646,6 +685,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
   }
 
   private actionError(error: unknown): SurfaceActionResult {
+    if (error instanceof NavigationPolicyError) throw error;
     return {
       ok: false,
       error: {

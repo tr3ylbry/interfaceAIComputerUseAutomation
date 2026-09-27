@@ -53,7 +53,7 @@ against the existing four-way ReplayResult union, including failure during valid
 Schema 1.1 adds optional `runtimeConditions` because 1.0 could not express the proxy's permission,
 busy, and operator-review screens. Each condition uses a normal checkpoint and a declared
 disposition. Version 1.0 without these conditions remains supported. ADR-006 records alternatives,
-versioning rationale, recovery semantics, and policy limitations.
+versioning rationale and recovery semantics. ADR-007 supersedes its post-navigation-only limitation.
 
 The coordinator processes one step at a time. UI checkpoints use bounded condition polling with
 injectable clock/sleep dependencies; output checks are immediate because replay is their only
@@ -64,6 +64,26 @@ Recovery counts explicit attempts beyond the original action. It may click a dec
 target, then recheck the interrupted checkpoint; it never blindly reissues the original click.
 An action error whose effects are uncertain stops with a failure. Runtime conditions and business
 outcomes are evaluated after recovery as well as ordinary actions.
+
+## Pre-request navigation boundary
+
+Replay passes a surface-independent navigation evaluator in `SurfaceOpenOptions` before opening.
+Web adapters must advertise guard support or replay fails closed. The evaluator uses the artifact's
+origin/path allowlist; no Playwright request, route, frame or protocol type appears in core contracts.
+Artifacts and ReplayResult schemas are unchanged. The small runtime seam is recorded in ADR-007.
+
+The Chromium adapter installs context routing before page creation and a Fetch Request-stage
+Document guard before initial navigation. Routing gates initial documents and installs separate
+frame-session guards; Fetch gates redirects (ordinary Playwright routing skips redirected hops).
+Links, forms, click-triggered script navigation, explicit navigation and frames share the allowlist.
+Service workers are disabled; auxiliary pages are blocked. Non-document resources pass unchanged.
+
+The first denial is sticky. Adapter boundaries propagate a generic NavigationPolicyError rather
+than a misleading browser network exception. Replay records a blocked policy event and returns
+`failure/policy_violation`, including safe origin-only diagnostics and current step where available.
+Cleanup also checks for late denials. The guard stays active during human ownership; categorical
+allowlist denials do not become requests for human approval. See the safety model for URL rules,
+non-network navigation and browser-internal traffic limitations.
 
 ## Session ownership
 
@@ -90,6 +110,7 @@ old target references; target resolution detects ownership changes across awaits
 7. Recoverable conditions use bounded policies and remain observable in the run log.
 8. Only one actor owns the live session at a time.
 9. Artifacts and logs must not persist secrets or raw sensitive data.
+10. Managed HTTP(S) document navigation is policy-gated before request egress, including redirects.
 
 Raw adapter evidence is accurately marked `redacted: false`. The demo uses fake data, stores
 runtime evidence under an ignored directory, and does not claim redaction that has not occurred.

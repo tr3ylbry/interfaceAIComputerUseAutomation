@@ -32,3 +32,10 @@ The headless demo reacquires and releases solely to verify the lifecycle. Real h
 requires `headless: false`. No operator console, action recorder, human-approval bypass, or automatic
 continuation is implemented. A subsequent continuation design must recheck location, policy and
 checkpoints before acting; reacquiring ownership alone must not imply approval of a risky action.
+
+The pre-request navigation guard remains attached to the same context/page throughout handoff.
+Human ownership does not expand the capability's origin/path allowlist. If a human causes a denied
+document navigation, the guard blocks and latches it; reacquisition fails rather than resuming in
+an invalid session. Explicit handoff disposal still closes/releases that session. A previously
+returned intervention result is not retroactively rewritten and no monitoring console is provided.
+Automation-originated allowlist violations return `failure/policy_violation`, not intervention.

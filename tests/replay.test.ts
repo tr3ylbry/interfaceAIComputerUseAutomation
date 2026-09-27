@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { CapabilityArtifactSchema, ReplayResultSchema, type CapabilityArtifact, type Checkpoint, type SurfaceAdapter } from "../src/contracts/index.js";
+import { CapabilityArtifactSchema, ReplayResultSchema, NavigationPolicyError, type CapabilityArtifact, type Checkpoint, type SurfaceAdapter } from "../src/contracts/index.js";
 import { ReplayCoordinator } from "../src/replay/index.js";
 import { locationAllowed } from "../src/replay/policy.js";
 import { transform } from "../src/replay/values.js";
@@ -19,6 +19,7 @@ function surface() {
   const session = { id: "session-1", kind: "web" as const };
   return {
     kind: "web" as const,
+    supportsNavigationGuard: true,
     open: vi.fn<SurfaceAdapter["open"]>().mockResolvedValue(session),
     observe: vi.fn<SurfaceAdapter["observe"]>().mockResolvedValue({ capturedAt: new Date().toISOString(),
       urlOrLocation: fixture.target.entryPoint, elements: [] }),
@@ -36,6 +37,39 @@ function surface() {
 const inputs = { member_id: "12345" };
 
 describe("generic replay", () => {
+  it("refuses web adapters without pre-request enforcement before opening", async () => {
+    const adapter = surface();
+    adapter.supportsNavigationGuard = false;
+    expect(await new ReplayCoordinator(adapter).run(artifact(), inputs)).toMatchObject({ status: "failure", code: "policy_violation" });
+    expect(adapter.open).not.toHaveBeenCalled();
+  });
+
+  it("passes a surface-independent navigation guard before session opening", async () => {
+    const adapter = surface();
+    await new ReplayCoordinator(adapter).run(artifact(), inputs);
+    const guard = adapter.open.mock.calls[0]![1]!.navigationGuard!;
+    expect(guard(fixture.target.entryPoint, "/members/12345").decision).toBe("allow");
+    expect(guard(fixture.target.entryPoint, "https://forbidden.test/").decision).toBe("block");
+  });
+
+  it("does not turn a late blocked navigation during cleanup into success or surface_error", async () => {
+    const adapter = surface();
+    adapter.close.mockRejectedValue(new NavigationPolicyError("http://localhost/[redacted]", "https://forbidden.test/[redacted]", "destination_not_allowed"));
+    expect(await new ReplayCoordinator(adapter).run(artifact(), inputs)).toMatchObject({ status: "failure", code: "policy_violation" });
+  });
+
+  it("retains a policy violation even if its diagnostic event sink throws", async () => {
+    const adapter = surface();
+    adapter.execute.mockRejectedValue(new NavigationPolicyError(fixture.target.entryPoint, "https://forbidden.test/private?secret=value", "destination_not_allowed"));
+    const result = await new ReplayCoordinator(adapter, { onEvent: (event) => {
+      if (event.type === "policy_decision" && event.decision === "block") throw new Error("Sink unavailable");
+    } }).run(artifact(), inputs);
+    expect(result).toMatchObject({ status: "failure", code: "policy_violation" });
+    expect(result.events).toContainEqual(expect.objectContaining({ type: "policy_decision", decision: "block" }));
+    expect(JSON.stringify(result)).not.toContain("secret=value");
+    expect(adapter.close).toHaveBeenCalledTimes(1);
+  });
+
   it("binds outputs for later actions/checkpoints, preserves artifact and emits policy before execute", async () => {
     const saved = artifact();
     saved.steps.push({ id: "fill-output", description: "Use prior output", risk: "reversible_write", action: "fill",

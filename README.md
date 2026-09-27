@@ -48,6 +48,12 @@ The coordinator imports only contracts and standard Node modules; it contains no
 model logic. Schema 1.1 adds declarative runtime conditions; existing 1.0 artifacts without those
 conditions remain supported. Draft fixtures require an explicit `allowDraft` development option.
 
+Browser document navigation is now checked before request egress, including links, forms, frames
+and redirects. Forbidden requests return `policy_violation`; server-counter tests verify that
+destinations receive zero requests. Ordinary cross-origin rendering resources remain allowed.
+This is Chromium-specific navigation enforcement, not a general network sandbox (see ADR-007 and
+`docs/safety-model.md`). A custom web adapter must support the runtime navigation guard.
+
 ## Setup
 
 Requirements: Node.js 22 or newer.
@@ -119,11 +125,13 @@ SemVer-major automatic remediation. The finding is intentionally unresolved rath
 1. Accept a natural-language goal and target.
 2. Run a real LLM-driven observe → decide → act discovery loop.
 3. Normalize the successful run into a typed/versioned capability artifact.
-4. Extend the proven generic replay path with browser egress enforcement and production redaction.
+4. Add production evidence redaction and retention to the proven generic replay path.
 5. Add explicit, checkpoint-verified continuation after human review if the submission needs it.
 
 The earlier `member-savings.ts` runner remains as the original adapter regression fixture; `npm run
 demo` uses the saved artifact and generic coordinator. Recovery never repeats an uncertain original
 action. Its explicit recovery clicks are policy checked; exhaustion defaults to failure and can be
 configured to request intervention. Location policy checks explicit destinations before execution
-and implicit click/form destinations after navigation; it is not a browser network sandbox.
+and browser document requests before egress. Frames share the capability allowlist; unsupported
+auxiliary pages and service workers are disabled/blocked. The same guard stays active during human
+control. No additional setup is required; `npm test` includes the navigation hit-counter matrix.

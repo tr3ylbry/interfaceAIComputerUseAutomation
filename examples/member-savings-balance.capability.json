@@ -252,7 +252,7 @@
   ],
   "policy": {
     "allowedOrigins": ["http://127.0.0.1:3000"],
-    "allowedPathPatterns": ["/member-search", "/members/*"],
+    "allowedPathPatterns": ["/member-search", "/members/*", "/frames/accounts/*"],
     "allowedActions": ["click", "fill", "wait", "extract"],
     "irreversibleActionPolicy": "require_human"
   },
