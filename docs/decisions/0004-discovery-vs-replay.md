@@ -29,3 +29,9 @@ actual observed controls, substitute caller-declared inputs and replay the resul
 fresh session for a different fake member, without calling the model. The provider is isolated in
 discovery, and static dependency tests keep generic replay free of model/application imports.
 This confirms the boundary, not the assignment's genuine live-LLM proof, which awaits credentials.
+
+## Subsequent evidence (2026-09-28)
+
+The credential-era limitation above is historical. ADR-008 records genuine run
+`aafa19ac-42a4-4550-b25b-7d57b4589c66`, generated-artifact replay with a different input, and zero
+replay model calls. Its accepted public bundle remains unchanged. No decision revision was needed.

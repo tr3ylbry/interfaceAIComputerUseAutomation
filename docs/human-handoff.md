@@ -16,6 +16,14 @@ At most one actor owns the session. Transitional paused/resuming states have no 
 
 The intervention request carries the current goal/capability, step, reason, state summary, and evidence. Human actions should be recorded in redacted form before control returns to automation.
 
+**Submission audit (2026-09-28): this is required, not implemented.** `HumanActionRecordSchema`
+currently has no recorder/consumer. Ownership history is not evidence of manual clicks, typing,
+selection or navigation. Existing tests/demo return ownership and release the browser without
+manual work or a successful subsequent automation action. Acceptance needs a minimal same-session
+manual-work → safe action records associated with the intervention/run → explicit handback →
+automation completion demonstration. This is a submission blocker; an operator console and
+automatic continuation are not required. No continuation/recording feature was added by the audit.
+
 ## Implemented replay lifecycle
 
 The coordinator creates an InterventionRequest for declared operator-review conditions, risky

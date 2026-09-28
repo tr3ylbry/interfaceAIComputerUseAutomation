@@ -17,6 +17,10 @@ zero replay model calls. See the [reviewed evidence](evidence/discovery/aafa19ac
 The first attempt's HTTP 429 remains preserved under
 `evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 182/182.
 
+Submission audit: the discovery/replay through-line is proven, but **handoff acceptance is incomplete**.
+Manual human-action recording and a demonstrated manual-work → handback → automation completion
+path are still required. See the [requirement matrix](docs/submission-readiness.md).
+
 Implemented contract layer:
 
 - `CapabilityArtifact`
@@ -70,15 +74,21 @@ This is Chromium-specific navigation enforcement, not a general network sandbox 
 
 ## Setup
 
-Requirements: Node.js 22 or newer.
+Requirements: Node.js 22 or newer, npm, and Chromium (installed below). Install development
+dependencies too: Playwright and the TypeScript build tools are needed by the demo commands.
 
 ```bash
-npm install
+git clone https://github.com/tr3ylbry/interfaceAIComputerUseAutomation.git
+cd interfaceAIComputerUseAutomation
+npm ci
 npx playwright install chromium
 npm run typecheck
 npm test
 ```
 
+On Linux hosts missing browser system libraries, use `npx playwright install --with-deps chromium`
+(system-package installation may require administrator permission). Initial dependency/browser
+installation needs network access; tests and replay demos thereafter need no API key or live service.
 The browser integration tests start the proxy on an ephemeral loopback port. In restricted
 environments, local port and browser-process permission may be required.
 
@@ -98,6 +108,7 @@ Open `http://127.0.0.1:3000/member-search`. Choose a state with the `scenario` q
 - `intervention`
 
 For example: `http://127.0.0.1:3000/member-search?scenario=slow`.
+If port 3000 is occupied, set `PORT` for the proxy command; replay demos use their own ephemeral port.
 
 Run the saved artifact through generic headless replay with:
 
@@ -114,6 +125,8 @@ Each demo starts an ephemeral local proxy and executes the same saved JSON capab
 endpoint/scenario configuration changed. Success returns `outputs.savings_balance: 4321.09`.
 The intervention smoke run verifies same-page reacquisition and explicitly releases the session;
 it does not simulate human approval or continue the interrupted run.
+The [published exceptional replay](evidence/discovery/d7727060-ec70-4f74-b4a8-501825698825/replay.sanitized.json)
+preserves a separate model-free `not-found` run, not a learned branch of the generated happy path.
 
 For programmatic use, import `ReplayCoordinator` from `src/replay/index.ts`, construct it with a
 `SurfaceAdapter`, and call `run(savedArtifact, { member_id: "12345" })`. On intervention, retrieve
@@ -137,7 +150,9 @@ SemVer-major automatic remediation. The finding is intentionally unresolved rath
 ## Run real discovery, compile, then replay
 
 Provide `OPENAI_API_KEY` through your environment or an ignored `.env.local` file; never paste it into
-logs or commit it. `.env.example` documents the optional `OPENAI_MODEL` override. Then run:
+logs or commit it. Copy `.env.example` to `.env.local`, uncomment the key entry and replace its placeholder locally,
+or use your shell's secure environment configuration. `OPENAI_MODEL` is optional and defaults to
+`gpt-6-astra`. Only the discovery command loads local env files. Then run:
 
 ```bash
 npm run discover
@@ -165,6 +180,9 @@ same live session through `DiscoveryCoordinator.getHandoff` and explicitly `rele
 The browser-backed **scripted-model** test proves fill → Search → Account Information → read → finish,
 compilation and different-input model-free replay. It is not proof that a real model chose those actions.
 Normal tests need no API key/network access beyond the local browser fixtures.
+For just that offline pipeline: `npm test -- tests/discovery-browser.test.ts`.
+To inspect/validate the existing public bundles without an API call, use the copyable fake-fixture
+validation command in [evidence/README.md](evidence/README.md#validate-the-committed-fixture-bundles).
 
 The first live attempt used this command unchanged, with a present key and the requested model.
 It made one API request and did not retry. The provider adapter records only the HTTP status on
@@ -180,15 +198,17 @@ This validates one controlled happy path and a second fake input, not general UI
 tenant portability. Both image and semantic observations were sent; this trace cannot isolate
 the contribution of visual reasoning. Raw screenshots/logs remain ignored and unredacted.
 
-## Remaining roadmap
+## Remaining acceptance work and deliberate cuts
 
-1. The generated evidence bundle is accepted and now passes a fail-closed public publication gate
-   unchanged. See `evidence/README.md` for `npm run evidence:validate` and the explicit publisher API.
-   Any further paid discovery run requires separate authorization.
-2. Add authenticated artifact approval; production raw-data redaction/retention remain separate gaps.
-3. Extend compilation only for demonstrated business/recovery branches; happy-path discovery does
-   not invent MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture.
-4. Add explicit, checkpoint-verified continuation after human review if the submission needs it.
+The next required task is minimal, safely recorded manual work in the same session, followed by
+explicit handback and demonstrated automation completion. Control-transfer events alone do not
+satisfy that requirement. No operator console or automatic continuation is required for this fix.
+
+Authenticated artifact approval is stretch work, not a submission prerequisite. Desktop execution,
+tenant binding implementation, learned failure branches, production raw-data redaction/retention,
+and automatic continuation remain outside this slice. Happy-path compilation does not invent
+MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture. Further paid discovery
+requires separate authorization; the accepted genuine bundle remains unchanged.
 
 The earlier `member-savings.ts` runner remains as the original adapter regression fixture; `npm run
 demo` uses the saved artifact and generic coordinator. Recovery never repeats an uncertain original

@@ -1,0 +1,168 @@
+{
+  "kind": "reviewed_value_free_replay_projection",
+  "redacted": true,
+  "source": "replay.raw.json",
+  "runId": "d7727060-ec70-4f74-b4a8-501825698825",
+  "capabilityId": "legacy-core.member.read-savings-balance",
+  "capabilityVersion": "0.1.0",
+  "startedAt": "2026-09-28T20:57:18.572Z",
+  "finishedAt": "2026-09-28T20:57:20.724Z",
+  "durationMs": 2152,
+  "status": "business_outcome",
+  "modelCallsDuringReplay": 0,
+  "invocationAndOutputValuesOmitted": true,
+  "events": [
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T20:57:18.595Z",
+      "action": "open",
+      "decision": "allow"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T20:57:19.948Z",
+      "stepId": "fill-member-id"
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.048Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.055Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.087Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.102Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T20:57:20.123Z",
+      "stepId": "fill-member-id",
+      "action": "fill",
+      "decision": "allow"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T20:57:20.137Z",
+      "stepId": "fill-member-id",
+      "targetId": "member-id-input",
+      "strategyIndex": 2
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.211Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.214Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.220Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.235Z",
+      "stepId": "fill-member-id",
+      "matched": false
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-28T20:57:20.235Z",
+      "stepId": "fill-member-id"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T20:57:20.235Z",
+      "stepId": "search-member"
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.282Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.285Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.289Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.301Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T20:57:20.343Z",
+      "stepId": "search-member",
+      "action": "click",
+      "decision": "allow"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T20:57:20.350Z",
+      "stepId": "search-member",
+      "targetId": "member-search-button",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.532Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.537Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.541Z",
+      "stepId": "search-member",
+      "matched": false
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T20:57:20.547Z",
+      "stepId": "search-member",
+      "targetId": "member-not-found-message",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T20:57:20.677Z",
+      "stepId": "search-member",
+      "matched": true
+    }
+  ]
+}

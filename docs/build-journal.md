@@ -533,3 +533,66 @@ not migrated into the new success-manifest schema. No provider or broader execut
 
 Next: bind authenticated artifact approval to the exact reviewed capability bytes and policy before
 non-development replay. No further live discovery attempt is authorized by this work.
+
+## 2026-09-28 — Submission-readiness audit
+
+### Scope and findings
+
+Audited baseline `a35c1e4fce33beae0b51c1491f3274bc6cc6439d` from clean setup through contracts,
+discovery/replay, public evidence, error states, policy, dependencies and handoff. No OpenAI call,
+discovery command, source/test change, prompt tuning, provider change or new architecture occurred.
+
+The working requirements checklist and completed safety task disagreed about handoff acceptance.
+The author clarified that **actual human-action recording is required**, along with same-session
+manual work, explicit handback and automation resuming/completing. Inspection found only an unused
+HumanActionRecord schema and ownership history. Tests reject stale automation and return ownership;
+the demo then releases the page. Neither records manual clicks/typing nor proves completion after
+manual work. This is an open submission blocker, not an operator-console or automatic-continuation cut.
+The previous authenticated-approval next-step recommendation is superseded for submission purposes.
+
+A second packaging gap was fixable without product changes: tests covered exceptional replay but
+no corresponding public log existed. Ran the existing `not-found` demo and used the unchanged
+allowlisted publisher to preserve replay-only run `d7727060-ec70-4f74-b4a8-501825698825`. It returned
+MEMBER_NOT_FOUND as business_outcome in 2,152 ms. The public projection intentionally omits domain
+code/value/free-text fields; the fixture and test corroborate the observed code. Its generated
+manifest binds public bytes and records the withheld raw-result hash. This is not learned branching
+or a new discovery attempt. Raw audit results/screenshots and the audit harness remain ignored.
+
+### Small corrections and tradeoffs
+
+Added a public technical acceptance matrix, exact locked-install/setup guidance and fake-fixture
+evidence-validation commands that do not require a missing private inventory. REPORT now has the
+seven literal headings and concise function-tool/desktop/tenant tradeoffs grounded in existing
+ADRs. Current architecture/handoff/README/REPORT and private defense notes identify the blocker;
+ADR-004 receives a subsequent-proof note without rewriting the credential-era history. No new ADR
+is warranted: this is acceptance clarification, not an implemented architectural decision.
+
+The audit does not disguise the missing recorder/return-completion path as a documentation fix.
+Implementing it requires a small, explicitly reviewed lifecycle slice and acceptance evidence;
+automatic continuation, authenticated approval and a polished UI remain outside this work.
+
+### Validation and evidence
+
+- Fresh temporary clone: lockfile install, Chromium installation, typecheck and **182/182 tests**
+  passed. npm noted local install-script approval policy; it did not prevent build/tests. Browser
+  installation used the available local cache. Linux system packages were not tested on macOS.
+- Working checkout: typecheck and **182/182 tests** passed, including all navigation-counter and
+  publication cases. No global timeout change or test weakening.
+- Six exact demo commands passed: success; member-not-found; slow recovery on attempt 1; persistent
+  busy exhaustion after two attempts; permission denial; intervention with unchanged page/epochs 2→4.
+  Failure/intervention screenshot/DOM evidence stays unredacted and ignored. Standalone proxy HTTP 200.
+- Accepted genuine bundle validates read-only with all four files unchanged. New replay-only bundle
+  validates after publication. First HTTP-429 evidence remains unchanged and manually reviewed;
+  its historical format is intentionally outside the strict success-manifest validation profile.
+- GitHub's public API confirmed a public main repository; fetched baseline was synchronized.
+  Tracked-file/key/path scan found only an intentionally fake credential-pattern test fixture, no
+  configured key, real credential or machine-local path. No raw/runtime/binary evidence is staged.
+- Dependency registry audit remains zero production / two moderate dev-only entries for the same
+  Vitest redirect-mock advisory. Disposition unchanged; no force fix or dependency change.
+
+### Verdict and next task
+
+**NOT READY** pending minimal recorded same-session human handoff and explicit post-handback
+automation completion. See `docs/submission-readiness.md`: 26 proven, four partial, one missing
+requirement. No more live discovery is needed. Preserve green baseline and existing accepted
+evidence; fix that single required lifecycle slice before submitting.

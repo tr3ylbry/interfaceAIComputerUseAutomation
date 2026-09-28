@@ -168,6 +168,11 @@ Normal terminal results close their sessions. A failed handoff also closes the s
 continuation is deliberately absent. Adapter handoff rejects in-flight actions and invalidates
 old target references; target resolution detects ownership changes across awaits.
 
+The submission audit identifies an acceptance gap: no actual manual-action recorder consumes
+`HumanActionRecord`, and tests do not demonstrate manual work followed by automation completion.
+Control-transfer events and returned ownership are not substitutes. See `human-handoff.md`;
+minimal explicit handback/completion is required, while automatic continuation is not.
+
 ## Core invariants
 
 1. Every executable replay step is explicit in the artifact.

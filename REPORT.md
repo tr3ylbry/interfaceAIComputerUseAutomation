@@ -1,4 +1,4 @@
-# 1. Architecture
+# Architecture
 
 Generic deterministic replay in `src/replay/` reads a saved capability, validates inputs and
 references, opens a SurfaceAdapter session, binds values, executes ordered steps and returns a
@@ -6,6 +6,10 @@ validated ReplayResult. Playwright stays inside its adapter. The demo's saved ar
 member 12345's savings balance as 4321.09. Bounded discovery and compilation now exist in
 `src/discovery/`, with an isolated OpenAI Responses adapter configured for gpt-6-astra. Each turn
 combines a live screenshot and compact semantic snapshot and proposes one strict tool action.
+Direct function tools keep every action policy-checkable and recordable. Native coordinate tools
+would provide less semantic locator evidence; model-generated scripts would bundle unreviewed
+execution outside this boundary (ADR-008). Replay interprets the artifact rather than asking a
+model to choose its next action: discover once, replay many.
 The first genuine API attempt (run `92eb2d6e-cdba-47e9-9051-bb442492f466`) returned HTTP 429 before
 any model decision: one request, zero UI actions, 2.098 seconds, no artifact or replay. Its reviewed
 failure manifest remains under `evidence/discovery/`. A separately authorized genuine attempt #2
@@ -18,7 +22,7 @@ matched. The [reviewed bundle](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4
 contains the exact artifact plus value-free tool/replay traces. This demonstrates the central
 through-line with real model choices, distinct from the separate scripted-model tests.
 
-# 2. Artifact schema
+# Artifact schema
 
 The JSON artifact declares inputs, outputs, ordered steps, logical targets with ordered locators,
 checkpoints, business outcomes, recovery budgets, and safety policy. Schema 1.1 adds checkpoint-based
@@ -30,7 +34,7 @@ adapter-verified controls, replaces caller-declared discovery values with input 
 emits a draft with provenance and output/source checkpoints. Ephemeral refs and raw transcripts do
 not enter the artifact. Undemonstrated business/recovery conditions are not invented.
 
-# 3. Determinism & error handling
+# Determinism & error handling
 
 Replay has no model dependency. Values live in an invocation context; output checkpoints execute
 there, while UI checks resolve through the adapter. Business outcomes precede subsequent extraction,
@@ -38,23 +42,35 @@ so MEMBER_NOT_FOUND terminates normally. Recovery emits attempt events and uses 
 actions or bounded checkpoint rechecks. Uncertain original actions are never blindly repeated.
 Exhaustion defaults to failure or can request intervention. Tests cover all terminal categories,
 policy denial, value binding, checkpoints, strict transforms, evidence failure and cleanup.
+The [published exceptional replay](evidence/discovery/d7727060-ec70-4f74-b4a8-501825698825/replay.sanitized.json)
+records `business_outcome` from the hand-authored fixture; it is not a learned failure branch.
 
-# 4. Heterogeneity & multi-tenant
+# Heterogeneity & multi-tenant
 
 The proxy uses imperfect labels, tables and an account iframe. Tests demonstrate semantic locator
 fallback and record the strategy index. Playwright types stay behind the surface boundary. Desktop
 support and tenant binding profiles are seams only; no desktop or multi-tenant portability claim
 has been demonstrated.
+A desktop adapter would implement observation/action/control ownership using OS accessibility,
+then bounded visual targeting where semantics are absent; window identity, focus, scaling and
+coordinate validity would need new evidence. Vendor-level workflow semantics should be versioned
+separately from tenant entry points, locator bindings, permissions and credentials. The existing
+productFamily/supportedVersions/bindingProfile metadata anticipates that seam; a reviewed binding
+profile and per-variant regression suite would be needed, not a claim that one artifact fits all.
 
-# 5. Escalation & handoff
+# Escalation & handoff
 
 Intervention creates an InterventionRequest and retains the same live session plus context/events.
 Browser tests verify unchanged page identity, exclusive ownership, increasing epochs, rejected
 automation under human control, and stale-reference invalidation. Callers explicitly release the
 session. A headful browser permits manual interaction; the automated demo verifies transfer and
 reacquisition only. Human action recording and automatic continuation are unimplemented.
+The submission audit confirmed that recording actual manual interactions is required: the unused
+HumanActionRecord contract and ownership events are insufficient. Manual work followed by explicit
+handback and resumed/completed automation has not been demonstrated. This is an **open submission
+blocker**, not an optional console feature. Automatic continuation remains outside scope.
 
-# 6. Safety
+# Safety
 
 Policy precedes opening and every execute call, including recovery. It constrains exact origins,
 anchored path patterns, action kinds and risk; irreversible actions block or require review. Runtime
@@ -79,7 +95,7 @@ evidence destinations. Generated manifests preserve public byte integrity and id
 sources. The accepted genuine four-file bundle passes these rules without modification. This is
 an application publication gate, not general redaction/DLP, authenticated attestation or retention.
 
-# 7. Cuts
+# Cuts
 
 No operator console, queue, database, application service API, desktop adapter, or tenant override
 engine is implemented. Recovery supports declared dismiss clicks and

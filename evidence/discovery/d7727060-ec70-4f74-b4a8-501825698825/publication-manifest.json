@@ -1,0 +1,25 @@
+{
+  "kind": "evidence_publication",
+  "version": 1,
+  "runId": "d7727060-ec70-4f74-b4a8-501825698825",
+  "generatedAt": "2026-09-28T20:57:20.847Z",
+  "reviewedAt": "2026-09-28T20:57:20.805Z",
+  "reviewStatus": "reviewed",
+  "publicationStatus": "validated",
+  "binaryPolicy": "withheld_manual_review_required",
+  "publicFiles": [
+    {
+      "file": "replay.sanitized.json",
+      "bytes": 4224,
+      "sha256": "98b41fbc9de4ae49abbf8115b37aa811da81349bb620e059e8bcf3d75a712cf6"
+    }
+  ],
+  "sources": [
+    {
+      "file": "replay.raw.json",
+      "bytes": 4800,
+      "sha256": "7bad9ce28f2749fd34e47614bc11ee7b74f4d17c507343b373ca66f80eabbf1e",
+      "withheld": true
+    }
+  ]
+}
