@@ -1,0 +1,62 @@
+{
+  "runId": "aafa19ac-42a4-4550-b25b-7d57b4589c66",
+  "model": {
+    "provider": "openai-responses",
+    "model": "gpt-6-astra"
+  },
+  "redacted": true,
+  "status": "success",
+  "turns": [
+    {
+      "turn": 1,
+      "tool": "ui_fill",
+      "observationId": "observation-0bcc4831-168e-436e-b256-f5c2321bb853"
+    },
+    {
+      "turn": 2,
+      "tool": "ui_click",
+      "observationId": "observation-822d17c1-c748-46a9-8653-2e4d0f61da03"
+    },
+    {
+      "turn": 3,
+      "tool": "ui_click",
+      "observationId": "observation-6fe8a511-8ae7-4cdb-a5c2-d8c9c0c37696"
+    },
+    {
+      "turn": 4,
+      "tool": "ui_read",
+      "observationId": "observation-b233d969-34a3-466f-b90a-0b3e300dc224"
+    },
+    {
+      "turn": 5,
+      "tool": "finish_discovery",
+      "observationId": "observation-760a2996-307a-4f07-9e0a-5b8a4d879c57"
+    }
+  ],
+  "actions": [
+    {
+      "index": 0,
+      "tool": "ui_fill",
+      "policy": "allow",
+      "executed": true
+    },
+    {
+      "index": 1,
+      "tool": "ui_click",
+      "policy": "allow",
+      "executed": true
+    },
+    {
+      "index": 2,
+      "tool": "ui_click",
+      "policy": "allow",
+      "executed": true
+    },
+    {
+      "index": 3,
+      "tool": "ui_read",
+      "policy": "allow",
+      "executed": true
+    }
+  ]
+}

@@ -8,16 +8,23 @@ member 12345's savings balance as 4321.09. Bounded discovery and compilation now
 combines a live screenshot and compact semantic snapshot and proposes one strict tool action.
 The first genuine API attempt (run `92eb2d6e-cdba-47e9-9051-bb442492f466`) returned HTTP 429 before
 any model decision: one request, zero UI actions, 2.098 seconds, no artifact or replay. Its reviewed
-failure manifest is under `evidence/discovery/`. Scripted-model browser tests separately prove
-compilation followed by fresh model-free replay for member 67890, returning 8765.43; that result
-must not be presented as a successful live-LLM run.
+failure manifest remains under `evidence/discovery/`. A separately authorized genuine attempt #2
+(`aafa19ac-42a4-4550-b25b-7d57b4589c66`) succeeded in 21.134 seconds and five Responses turns:
+fill member `12345`, click Search, click Account Information, read the Savings value, then finish.
+Discovery returned `4321.09` and verified the live source. The compiler produced a schema-1.1 draft;
+the unchanged artifact replayed in a fresh browser for member `67890`, returning `8765.43` in
+484 ms with zero model calls. All targets used strategy index 0 and all four checkpoint events
+matched. The [reviewed bundle](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/review-manifest.json)
+contains the exact artifact plus value-free tool/replay traces. This demonstrates the central
+through-line with real model choices, distinct from the separate scripted-model tests.
 
 # 2. Artifact schema
 
 The JSON artifact declares inputs, outputs, ordered steps, logical targets with ordered locators,
 checkpoints, business outcomes, recovery budgets, and safety policy. Schema 1.1 adds checkpoint-based
 runtime conditions for failures, recoverable states, and intervention. Version 1.0 artifacts without
-conditions still validate. The fixture is manually authored, not evidence of an LLM discovery run.
+conditions still validate. The example fixture remains manually authored; the separate attempt #2
+artifact was genuinely generated and was neither replaced nor hand-edited before replay.
 The compiler instead consumes normalized, verified DiscoveryRun evidence, derives targets from
 adapter-verified controls, replaces caller-declared discovery values with input references, and
 emits a draft with provenance and output/source checkpoints. Ephemeral refs and raw transcripts do
@@ -77,6 +84,10 @@ linear successful paths and exact scalar input substitution, not arbitrary value
 branch discovery. A typed value read from a live source is necessary, but does not prove that an LLM
 selected the semantically correct account. The first live run exposed a diagnostic limitation:
 non-success provider bodies/headers are discarded, so HTTP 429 cannot be classified further from
-the saved evidence. Next review the project's API limits/billing and, if approved, add only safe
-provider error metadata before a separately authorized attempt. No code/prompt change or retry was
-made for this first-run review. The central successful live-LLM acceptance proof remains open.
+the saved evidence. Success headers, exact HTTP status and response model echo are also not
+persisted; five completed decisions are evidenced, not reconstructed provider metadata. No code,
+prompt or architecture change was needed for attempt #2. One controlled happy path and one second
+fake input do not establish broader reliability, adversarial robustness or tenant portability.
+The exact artifact retains its original loopback endpoint; automatic rebinding is not demonstrated.
+Review the accepted evidence/draft before choosing further work. Production evidence handling and
+artifact approval remain the next safety gaps; no further live attempt is implied.

@@ -1,0 +1,333 @@
+{
+  "kind": "post_run_review_not_provider_transcript",
+  "attempt": 2,
+  "runId": "aafa19ac-42a4-4550-b25b-7d57b4589c66",
+  "baselineCommit": "02ff7f39827e6a2e2ce7715d062642430e5d896a",
+  "baseline": {
+    "branch": "main",
+    "workingTreeClean": true,
+    "synchronizedWithOrigin": true,
+    "keyPresent": true,
+    "typecheck": "passed",
+    "testsPassed": 127
+  },
+  "command": "npm run discover",
+  "postRunValidation": {
+    "typecheck": "passed",
+    "testsPassed": 127,
+    "sourceAndTestsUnchanged": true
+  },
+  "genuineApiDiscovery": true,
+  "provider": "openai-responses",
+  "requestedModel": "gpt-6-astra",
+  "reasoningEffort": "medium",
+  "store": false,
+  "strictFunctionTools": true,
+  "parallelToolCalls": false,
+  "configurationSource": "Unchanged provider adapter at baseline commit; no raw provider response objects retained.",
+  "startedAt": "2026-09-28T17:47:44.980Z",
+  "finishedAt": "2026-09-28T17:48:06.114Z",
+  "coordinatorDurationMs": 21134,
+  "modelTurns": 5,
+  "toolSequence": [
+    "ui_fill",
+    "ui_click",
+    "ui_click",
+    "ui_read",
+    "finish_discovery"
+  ],
+  "actions": [
+    {
+      "index": 0,
+      "tool": "ui_fill",
+      "selectedControl": {
+        "role": "textbox",
+        "name": "",
+        "contextText": "Member No."
+      },
+      "policy": {
+        "risk": "reversible_write",
+        "decision": "allow",
+        "reason": "Action and location permitted"
+      },
+      "executed": true
+    },
+    {
+      "index": 1,
+      "tool": "ui_click",
+      "selectedControl": {
+        "role": "button",
+        "name": "Search",
+        "contextText": ""
+      },
+      "policy": {
+        "risk": "read_only",
+        "decision": "allow",
+        "reason": "Action and location permitted"
+      },
+      "executed": true
+    },
+    {
+      "index": 2,
+      "tool": "ui_click",
+      "selectedControl": {
+        "role": "link",
+        "name": "Account Information",
+        "contextText": ""
+      },
+      "policy": {
+        "risk": "read_only",
+        "decision": "allow",
+        "reason": "Action and location permitted"
+      },
+      "executed": true
+    },
+    {
+      "index": 3,
+      "tool": "ui_read",
+      "selectedControl": {
+        "role": "span",
+        "name": "",
+        "contextText": "Savings"
+      },
+      "policy": {
+        "risk": "read_only",
+        "decision": "allow",
+        "reason": "Action and location permitted"
+      },
+      "executed": true
+    }
+  ],
+  "blockedProposals": [],
+  "intervention": null,
+  "outputs": {
+    "savings_balance": {
+      "type": "currency",
+      "matchesExpectedDiscoveryFixture": true,
+      "valueOmitted": true
+    }
+  },
+  "finishVerification": {
+    "passed": true,
+    "method": "Typed required output plus live source text equality after explicit finish_discovery."
+  },
+  "artifact": {
+    "path": "capability.json",
+    "schemaVersion": "1.1",
+    "schemaValidation": "passed",
+    "referenceValidation": "passed",
+    "capabilityId": "discovered.member-savings",
+    "version": "0.1.0",
+    "approvalState": "draft",
+    "stepSequence": [
+      "fill",
+      "click",
+      "click",
+      "extract"
+    ],
+    "targetStrategyChains": [
+      {
+        "targetId": "target-0",
+        "strategies": [
+          "relative",
+          "selector"
+        ],
+        "frameScoped": false
+      },
+      {
+        "targetId": "target-1",
+        "strategies": [
+          "accessibility",
+          "selector"
+        ],
+        "frameScoped": false
+      },
+      {
+        "targetId": "target-2",
+        "strategies": [
+          "accessibility",
+          "text",
+          "selector"
+        ],
+        "frameScoped": false
+      },
+      {
+        "targetId": "target-3",
+        "strategies": [
+          "relative",
+          "selector"
+        ],
+        "frameScoped": true
+      }
+    ],
+    "memberInputParameterized": true,
+    "discoveryValuesAbsent": true,
+    "ephemeralRefsAbsent": true,
+    "providerAndPlaywrightObjectsAbsent": true,
+    "provenanceMatches": true,
+    "handEdited": false,
+    "publicCopy": "Byte-for-byte original; retains the run's loopback endpoint, not rebound for another environment."
+  },
+  "replay": {
+    "runId": "f626f4cd-4827-4b72-aa15-bc3bc3781542",
+    "status": "success",
+    "durationMs": 484,
+    "freshBrowser": true,
+    "sameSerializedArtifact": true,
+    "differentDeclaredInput": true,
+    "matchesExpectedReplayFixture": true,
+    "modelCalls": 0,
+    "modelCallCountBasis": "CLI model counter before/after ReplayCoordinator.run; no provider dependency in replay.",
+    "resolvedTargets": [
+      {
+        "stepId": "step-0",
+        "targetId": "target-0",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-0",
+        "targetId": "target-1",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-1",
+        "targetId": "target-1",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-1",
+        "targetId": "target-2",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-2",
+        "targetId": "target-2",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-2",
+        "targetId": "target-3",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-3",
+        "targetId": "target-3",
+        "strategyIndex": 0
+      },
+      {
+        "stepId": "step-3",
+        "targetId": "target-3",
+        "strategyIndex": 0
+      }
+    ],
+    "checkpoints": [
+      {
+        "stepId": "step-0",
+        "matched": true
+      },
+      {
+        "stepId": "step-1",
+        "matched": true
+      },
+      {
+        "stepId": "step-2",
+        "matched": true
+      },
+      {
+        "stepId": "step-3",
+        "matched": true
+      }
+    ],
+    "recoveryEvents": 0
+  },
+  "providerResult": {
+    "successfulCompletedDecisions": 5,
+    "httpStatus": null,
+    "errorType": null,
+    "errorCode": null,
+    "requestId": null,
+    "retryAfter": null,
+    "rateLimitMetadata": null,
+    "limitation": "The unchanged adapter returned five validated decisions only after successful HTTP responses with status completed. Exact HTTP status, response model echo, request IDs and headers were not persisted; do not reconstruct them."
+  },
+  "implementationChanges": false,
+  "promptChanges": false,
+  "automaticRetries": 0,
+  "manualRetries": 0,
+  "originalEvidence": [
+    {
+      "file": "capability.json",
+      "bytes": 5294,
+      "sha256": "30a431ac3a45729d1cf8d887ea1c8057254579da072f1892bd6e3b155b03d6df"
+    },
+    {
+      "file": "discovery-run.raw.json",
+      "bytes": 31286,
+      "sha256": "ec4be079441c165becb694ee7229442bc681e1c78e9f74875cd94d47b18a8e78"
+    },
+    {
+      "file": "manifest.json",
+      "bytes": 695,
+      "sha256": "b053ec8d6490a974bcca7d47a54a935a7bd5d0ea0ec7eead07cf4e4f3f14c05c"
+    },
+    {
+      "file": "observation-0.png",
+      "bytes": 17132,
+      "sha256": "0762fbca1a23ddad54dd65652310eabeb2cf544dda0fe4795bbcd6c79d3aa35f"
+    },
+    {
+      "file": "observation-1.png",
+      "bytes": 17962,
+      "sha256": "e8d3a382218682bc8285c43e6a7d47ff878227c20442a053cc7cc9cbbcb4380f"
+    },
+    {
+      "file": "observation-2.png",
+      "bytes": 19027,
+      "sha256": "0412338bcab4f3013493a53996e01f954c7342c34cebb4e1835188e376f1f99a"
+    },
+    {
+      "file": "observation-3.png",
+      "bytes": 23242,
+      "sha256": "420c2ff7192ae172e7377381d626ff01a5f6dc98558ed5fa8f5a91672187aec9"
+    },
+    {
+      "file": "observation-4.png",
+      "bytes": 23242,
+      "sha256": "420c2ff7192ae172e7377381d626ff01a5f6dc98558ed5fa8f5a91672187aec9"
+    },
+    {
+      "file": "replay.raw.json",
+      "bytes": 4585,
+      "sha256": "d3a847f0697403f2bdfd82a16f7750eac6f198d59214d8b819074425aa1c4561"
+    },
+    {
+      "file": "tool-trace.sanitized.json",
+      "bytes": 1287,
+      "sha256": "a1800aa3137c53ef0b32631bf1a80dedebef76a381517c218960f156d417bcb9"
+    }
+  ],
+  "publicationReview": {
+    "rawEvidenceRemainsIgnored": true,
+    "originalEvidenceUnchanged": true,
+    "firstAttemptPreserved": true,
+    "screenshotsVisuallyReviewed": 5,
+    "configuredKeyFound": false,
+    "credentialHeadersOrCookiesFound": false,
+    "absoluteLocalPathsInPublicBundle": false,
+    "rawManifestContainsLocalArtifactPath": true,
+    "publicFiles": [
+      "capability.json",
+      "tool-trace.sanitized.json",
+      "replay.sanitized.json",
+      "review-manifest.json"
+    ],
+    "sanitization": "Only reviewed artifact, existing value-free tool trace, value-free replay event projection and authored review metadata are public. Raw screenshots/logs and original manifest remain ignored.",
+    "limitation": "A review of this fake-data run, not a general redaction pipeline or signed provider attestation."
+  },
+  "limitations": [
+    "One happy path and one different fake input, not broad reliability or tenant portability.",
+    "Hybrid inputs were sent; the contribution of visual reasoning versus semantic evidence is not measurable from the normalized trace.",
+    "Unobserved business outcomes/recovery conditions are intentionally absent.",
+    "Draft artifact references the original ephemeral proxy endpoint; no restart rebinding is demonstrated."
+  ]
+}

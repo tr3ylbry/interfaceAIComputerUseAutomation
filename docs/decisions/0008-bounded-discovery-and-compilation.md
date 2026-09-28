@@ -1,6 +1,6 @@
 # ADR-008: Typed discovery with strict direct model tools
 
-**Status:** Accepted and implemented; first live attempt stopped at HTTP 429, successful proof pending.
+**Status:** Accepted and implemented; genuine discovery and different-input replay demonstrated on attempt #2. First-attempt HTTP 429 evidence is preserved.
 
 ## Context
 
@@ -101,3 +101,27 @@ headers. No model prompt/tool changes are supported by this attempt because no p
 The existing one-attempt policy remains. See the reviewed metadata-only failure manifest under
 `evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. OpenAI documents multiple
 [HTTP 429 causes](https://developers.openai.com/api/docs/guides/error-codes); status alone is insufficient.
+
+## Second genuine attempt — 2026-09-28
+
+Run `aafa19ac-42a4-4550-b25b-7d57b4589c66` used clean, synchronized baseline
+`02ff7f39827e6a2e2ce7715d062642430e5d896a` with 127/127 passing tests. No production, prompt,
+model, reasoning or tool changes preceded the single authorized run. Five real Responses turns
+selected fill → Search → Account Information → read Savings → finish. Four independently approved
+UI actions executed through SurfaceAdapter; no blocked proposal, refusal or handoff occurred.
+Discovery took 21.134 seconds, read `4321.09`, and passed live-source finish verification.
+
+The generated draft parameterized member_id, retained only verified value-independent locators,
+and contained no ephemeral refs or provider/Playwright objects. The unchanged artifact then
+replayed for another fake member in a fresh browser, returning `8765.43` with zero model calls.
+All targets resolved at index 0 and all four checkpoint events matched. The original Savings-text
+locator depended on the discovered balance and was correctly excluded; the row-relative strategy
+generalized to the second member. No manual repair, retry or hand-authored replacement was used.
+
+The decision is confirmed for this narrow controlled path; no design revision is justified by the
+run. There was no visual-only control, so hybrid inputs do not prove vision was necessary. This
+does not establish tenant-wide stability, authenticated provenance or automatic draft approval.
+Provider success HTTP status/headers/model echo were not persisted, and the existing first-run
+diagnostic limitation remains. Reviewed public evidence is under
+`evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/`; raw records remain ignored. Both attempts
+remain in the history. Review the draft/evidence before any separately authorized next phase.

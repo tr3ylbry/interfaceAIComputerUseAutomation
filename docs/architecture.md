@@ -77,8 +77,16 @@ the existing generic replay on a fresh session with another fake member. Offline
 prove this pipeline with a scripted model (12345 → 4321.09, then 67890 → 8765.43, zero replay model
 calls). The first genuine provider request returned HTTP 429 before a decision (run
 `92eb2d6e-cdba-47e9-9051-bb442492f466`); no generated artifact or live-discovery replay resulted.
-This confirms failure stopping/evidence capture, not the model's workflow capability. Architecture
-and prompts remain unchanged pending review; success with a real model remains unverified.
+That first failure confirms stopping/evidence capture, not the model's workflow capability.
+Attempt #2 (`aafa19ac-42a4-4550-b25b-7d57b4589c66`) then demonstrated real model-selected
+fill → Search → Account Information → read Savings → finish in five turns, without changing
+production code or prompts. Live source verification passed for `4321.09`; the exact compiled
+schema-1.1 draft replayed on member `67890` in a fresh browser and returned `8765.43`, with zero
+model calls, index-0 locator resolutions and four matched checkpoint events. The public evidence
+bundle preserves the unedited draft and value-free traces; raw screenshots/logs remain ignored.
+This confirms the chosen boundaries for this happy path, not arbitrary branch discovery or general
+visual reasoning. The relative Savings locator was retained while the discovery-balance text
+locator was removed. No schema, provider, surface or replay architecture changed for this proof.
 
 ## Implemented vertical slice
 

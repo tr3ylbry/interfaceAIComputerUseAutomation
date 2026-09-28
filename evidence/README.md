@@ -1,9 +1,9 @@
 # Evidence
 
-This directory documents the evidence boundary. **The first genuine OpenAI attempt failed with
-HTTP 429 before any model decision.** Its raw evidence remains ignored and a reviewed metadata-only
-summary is available below. Passing scripted-model tests are engineering evidence, not proof of a
-real model choosing UI actions. The example capability remains hand-authored.
+This directory documents the evidence boundary. **Attempt #2 demonstrates genuine OpenAI discovery
+followed by different-input, model-free replay.** Attempt #1's HTTP 429 and untouched raw evidence
+remain preserved. Scripted-model tests remain separate engineering evidence; the example capability
+remains hand-authored. Raw screenshots/logs are not public merely because the bank data is fake.
 
 ## First attempt: provider failure, not successful discovery
 
@@ -30,7 +30,46 @@ stores returned decisions, which were zero.
 The provider's 429 subtype, request ID and Retry-After were discarded by the existing adapter.
 Do not label this definitively as transient rate limiting or insufficient credits. No model mistake,
 semantic-vs-visual strategy, target normalization or cross-member generalization can be assessed
-from a response that returned no action. Success evidence is still outstanding.
+from a response that returned no action. The separately authorized success is recorded below.
+
+## Attempt #2: genuine discovery and unchanged-artifact replay
+
+Run `aafa19ac-42a4-4550-b25b-7d57b4589c66` used unchanged production code/prompts at commit
+`02ff7f39827e6a2e2ce7715d062642430e5d896a`, after clean synchronized main, a safe key-presence
+check, typecheck and 127/127 tests. Exactly one `npm run discover` invocation selected five model
+decisions: fill → Search → Account Information → read Savings → finish. Discovery took 21.134s;
+the real UI returned the expected first-member balance and live-source finish verification passed.
+Fresh generic replay of the same serialized artifact returned the second-member balance in 484ms,
+with zero additional model calls, no recovery and four matched checkpoint events.
+
+Reviewed submission-candidate files:
+
+- [review-manifest.json](discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/review-manifest.json):
+  explicitly authored post-run review, source hashes, safe control/policy metadata and fixture-match
+  results. It is not a raw provider transcript or authenticated attestation.
+- [capability.json](discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/capability.json): byte-for-byte
+  generated draft, schema/reference validated, no concrete inputs/outputs, runtime refs or
+  provider/browser objects. The run's ephemeral loopback URL is deliberately retained; this is not
+  a rebound artifact or a promise that the closed server is still available.
+- [tool-trace.sanitized.json](discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/tool-trace.sanitized.json):
+  byte-for-byte value-free trace written by the coordinator's evidence writer.
+- [replay.sanitized.json](discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/replay.sanitized.json):
+  reviewed projection of the real replay log retaining event order/timestamps/locator indices/
+  checkpoint results, with invocation and output values omitted. Not another replay execution.
+
+Ten original files remain unchanged under ignored `runtime/discovery/<run-id>/`: full structured
+run, five unredacted screenshots, generated capability, original CLI manifest, raw replay result,
+and sanitized tool trace. All screenshots were visually reviewed and show only the fake proxy.
+The original manifest includes an absolute local artifact path, so it is **not** copied publicly.
+The reviewed public bundle contains no configured key, authorization/cookie material, provider
+secrets, absolute filesystem paths or unrelated sensitive data. Raw records retain declared
+sensitive fake values; they remain private, not relabelled as sanitized.
+
+The adapter only yields decisions after successful completed Responses results; exact success
+HTTP status, request IDs, headers/rate-limit metadata and response model echo were not retained.
+Do not reconstruct those fields. Both screenshot and semantic inputs were sent, but the trace
+cannot quantify the model's reliance on vision. This proves one controlled path and a second input,
+not unseen business branches, arbitrary UI robustness or a general redaction pipeline.
 
 ## Explicit real-run command
 

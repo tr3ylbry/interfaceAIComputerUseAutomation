@@ -1,0 +1,175 @@
+{
+  "kind": "reviewed_value_free_replay_projection",
+  "redacted": true,
+  "source": "replay.raw.json",
+  "runId": "f626f4cd-4827-4b72-aa15-bc3bc3781542",
+  "capabilityId": "discovered.member-savings",
+  "capabilityVersion": "0.1.0",
+  "startedAt": "2026-09-28T17:48:06.124Z",
+  "finishedAt": "2026-09-28T17:48:06.608Z",
+  "durationMs": 484,
+  "status": "success",
+  "modelCallsDuringReplay": 0,
+  "invocationAndOutputValuesOmitted": true,
+  "events": [
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T17:48:06.124Z",
+      "action": "open",
+      "decision": "allow",
+      "reason": "Action and location permitted"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T17:48:06.314Z",
+      "stepId": "step-0"
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T17:48:06.344Z",
+      "stepId": "step-0",
+      "action": "fill",
+      "decision": "allow",
+      "reason": "Action and location permitted"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.346Z",
+      "stepId": "step-0",
+      "targetId": "target-0",
+      "strategyIndex": 0
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.366Z",
+      "stepId": "step-0",
+      "targetId": "target-1",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T17:48:06.369Z",
+      "stepId": "step-0",
+      "matched": true
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-28T17:48:06.369Z",
+      "stepId": "step-0"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T17:48:06.369Z",
+      "stepId": "step-1"
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T17:48:06.385Z",
+      "stepId": "step-1",
+      "action": "click",
+      "decision": "allow",
+      "reason": "Action and location permitted"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.386Z",
+      "stepId": "step-1",
+      "targetId": "target-1",
+      "strategyIndex": 0
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.442Z",
+      "stepId": "step-1",
+      "targetId": "target-2",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T17:48:06.445Z",
+      "stepId": "step-1",
+      "matched": true
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-28T17:48:06.445Z",
+      "stepId": "step-1"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T17:48:06.445Z",
+      "stepId": "step-2"
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T17:48:06.453Z",
+      "stepId": "step-2",
+      "action": "click",
+      "decision": "allow",
+      "reason": "Action and location permitted"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.455Z",
+      "stepId": "step-2",
+      "targetId": "target-2",
+      "strategyIndex": 0
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.537Z",
+      "stepId": "step-2",
+      "targetId": "target-3",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T17:48:06.542Z",
+      "stepId": "step-2",
+      "matched": true
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-28T17:48:06.542Z",
+      "stepId": "step-2"
+    },
+    {
+      "type": "step_started",
+      "at": "2026-09-28T17:48:06.542Z",
+      "stepId": "step-3"
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-28T17:48:06.556Z",
+      "stepId": "step-3",
+      "action": "extract",
+      "decision": "allow",
+      "reason": "Action and location permitted"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.558Z",
+      "stepId": "step-3",
+      "targetId": "target-3",
+      "strategyIndex": 0
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-28T17:48:06.577Z",
+      "stepId": "step-3"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-28T17:48:06.585Z",
+      "stepId": "step-3",
+      "targetId": "target-3",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-28T17:48:06.589Z",
+      "stepId": "step-3",
+      "matched": true
+    }
+  ]
+}

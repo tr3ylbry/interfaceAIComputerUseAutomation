@@ -365,3 +365,103 @@ No OpenAI API request or `npm run discover` was run. Existing first-attempt 429 
 unchanged. The test blockers are resolved; the next step is explicit authorization for exactly one
 live discovery attempt, with the usual clean-branch/typecheck/test preflight. Passing scripted
 tests still does not prove that genuine discovery or different-input replay will succeed.
+
+## 2026-09-28 — Genuine attempt #2 proves discovery-to-replay
+
+### Baseline and execution discipline
+
+At clean, synchronized main `02ff7f39827e6a2e2ce7715d062642430e5d896a`, confirmed the local key
+without displaying it, then passed typecheck and all 127 tests. Verified unchanged Responses API,
+gpt-6-astra, medium reasoning, `store: false`, strict direct function tools, no parallel calls and
+one decision per observation cycle. Ran the canonical `npm run discover` exactly once. It started
+the fake proxy and used the real provider, not the scripted model or example capability.
+
+The earlier preflight-only stop made zero API calls and is not counted as an extra live attempt.
+Attempt #1 (`92eb2d6e-cdba-47e9-9051-bb442492f466`) remains unchanged; hashes of all three original
+files still match its existing review manifest. No retry, manual guidance, prompt tuning, provider
+substitution, production change, artifact repair or additional replay was performed in this phase.
+
+### Actual model behavior
+
+Run `aafa19ac-42a4-4550-b25b-7d57b4589c66` started at `2026-09-28T17:47:44.980Z` and finished at
+`17:48:06.114Z`: 21,134 ms for discovery. Five real Responses turns produced:
+
+1. `ui_fill`: the unnamed textbox with row context `Member No.`, value `12345`.
+2. `ui_click`: the named Search button.
+3. `ui_click`: the Account Information link on the member detail page.
+4. `ui_read`: the span in the Savings row within `iframe[name="accountPane"]`, text extraction
+   into `savings_balance`.
+5. `finish_discovery`: explicit finish, only after the read.
+
+The fill was classified reversible_write; the two inquiry clicks and read were read_only. All four
+actions received `allow` before execution. No incorrect/ambiguous proposal, block, refusal, risky
+dialog or intervention was observed. The model did not select the Checking row or guess a balance.
+The read returned `$4,321.09`, transformed to currency number `4321.09`. Finish re-resolved the
+live source and matched its current text against the extracted source value. Success was not
+accepted merely because the model called finish.
+
+Five hybrid observations contained nine/nine/nine/seven/seven controls and real viewport PNGs.
+The selected controls fit useful semantic evidence even where accessible names were missing.
+The screenshot was supplied every turn, but the trace cannot prove how much visual reasoning
+contributed; do not claim a visual-only automation demonstration.
+
+### Compilation and untouched fresh replay
+
+The existing CLI compiled, schema/reference-validated and saved the exact generated draft before
+replaying its serialized bytes. Post-run inspection independently revalidated it. Capability
+`discovered.member-savings@0.1.0` uses schema 1.1, approvalState draft, typed string member_id and
+currency savings_balance. Four steps are fill → click → click → extract. Target chains are:
+
+- Member No.: row-relative input, then verified named-input CSS.
+- Search: accessible button/name, then verified structural CSS.
+- Account Information: accessible link/name, exact text, then verified structural CSS.
+- Savings: frame-scoped row-relative value, then verified structural CSS.
+
+The fill uses `{ source: "input", name: "member_id" }`. The compiler removed the balance-dependent
+text locator; it did not invent a new strategy. No concrete discovery input/output, ephemeral ref,
+OpenAI response object or Playwright type appears in the artifact. Provenance identifies this
+genuine run and compiler 0.2.0. Success requires the bound output and its visible source; intermediate
+checkpoints require the next acted-on control to be visible. Unseen business/recovery branches remain
+empty. The artifact is readable but long structural fallback locators remain a portability limit.
+
+Fresh replay `f626f4cd-4827-4b72-aa15-bc3bc3781542` used the same generated artifact with member
+`67890`, returned `success` and `8765.43`, and reported 484 ms. The model counter remained at five:
+zero replay model calls. All eight target-resolution events (including checkpoint resolutions)
+used strategy index 0; all four checkpoint events matched. There were no recovery events or locator/
+replay failures. This proves the controlled different-input through-line, not all unseen inputs.
+
+### Evidence review and limits
+
+Ten original files remain ignored under `evidence/runtime/discovery/<run-id>/`: five screenshots,
+raw structured run, raw replay, original CLI manifest, generated draft and sanitized tool trace.
+All screenshots show only the fake proxy; raw values are accurately labelled unredacted. Checks
+found no configured key, credential/header/cookie material in the originals. The original CLI
+manifest contains an absolute artifact path, so it stays private.
+
+The reviewed public bundle under `evidence/discovery/<run-id>/` contains a byte-identical artifact
+and tool trace, a value-free replay event projection, and an explicitly authored review manifest
+with hashes of all originals. No screenshots, raw run/replay logs or original manifest are published.
+Public evidence contains no absolute filesystem paths, secrets or unrelated data. The artifact's
+loopback URL is intentionally preserved, not rewritten to imply portability across proxy restarts.
+
+Five validated decisions establish completed successful Responses calls through the unchanged
+provider code. Exact HTTP status, request IDs, response model echo and rate-limit headers were not
+persisted and cannot be reconstructed. No raw provider body or hidden reasoning was retained.
+The first attempt's HTTP 429 subtype remains unknown; later success does not retroactively prove
+which cause applied. One successful run is neither a model reliability estimate nor authenticated
+provider attestation. Production redaction/retention and signed approval remain unimplemented.
+
+### Decisions, documentation and next step
+
+Direct bounded tools, independent policy, verified target normalization, caller-declared parameters
+and model-free replay all behaved as designed. No architecture or prompt change is justified by
+this clean run. ADR-008 gains evidence, not a new decision. Updated README, REPORT, architecture,
+ADR-008, evidence README/review bundle, this journal and ignored interview notes; synchronized the
+Notion engineering record. Post-run `npm run typecheck` passed and `npm test` passed 127/127.
+Final diff/secret review found only documentation and the four reviewed public evidence files;
+no source/tests, credentials, ignored raw evidence or generated runtime junk are included.
+
+Next: review and accept this generated draft/evidence package, then explicitly select the next
+limited safety slice (production evidence redaction/retention or artifact approval). Do not run
+another paid discovery attempt implicitly. Preserve both attempts and keep the generated happy
+path distinct from the manually authored fixture's business/recovery branches.

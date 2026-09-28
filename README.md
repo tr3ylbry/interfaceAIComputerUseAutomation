@@ -9,10 +9,13 @@ The system is designed around a simple product boundary:
 ## Current status
 
 The core contracts, browser adapter, generic deterministic replay, bounded discovery coordinator,
-OpenAI provider adapter and artifact compiler are implemented. **The first genuine API attempt
-returned HTTP 429 before any model decision.** No live-discovered capability or different-input
-replay resulted. The reviewed failure is preserved under
-`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`; offline tests still pass 126/126.
+OpenAI provider adapter and artifact compiler are implemented. **Genuine discovery → generated
+artifact → different-input, model-free replay is demonstrated.** Attempt #2, run
+`aafa19ac-42a4-4550-b25b-7d57b4589c66`, used gpt-6-astra/medium for five turns, read `4321.09` for
+fake member `12345`, then replayed its unchanged artifact for `67890`, returning `8765.43` with
+zero replay model calls. See the [reviewed evidence](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/review-manifest.json).
+The first attempt's HTTP 429 remains preserved under
+`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 127/127.
 
 Implemented contract layer:
 
@@ -31,7 +34,10 @@ Implemented contract layer:
 
 See `docs/decisions/0005-targeting-and-core-contracts.md` for rationale and invariants.
 
-A non-evidence serialized fixture lives at `examples/member-savings-balance.capability.json` to make the artifact contract easy to inspect before the real discovery run exists.
+The hand-authored fixture at `examples/member-savings-balance.capability.json` exercises replay
+branches. The separate [live-generated draft](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/capability.json)
+is the exact artifact used in attempt #2's different-input replay; it retains that run's ephemeral
+proxy endpoint and is not automatically rebound after a restart.
 
 Implemented browser slice:
 
@@ -162,18 +168,25 @@ Normal tests need no API key/network access beyond the local browser fixtures.
 The first live attempt used this command unchanged, with a present key and the requested model.
 It made one API request and did not retry. The provider adapter records only the HTTP status on
 failure, so `provider_http_429` alone cannot distinguish rate limiting from quota/billing limits.
-Check the associated project's API limits/billing before authorizing another attempt. No prompt
-change is justified by this result because the model returned no action.
+Its evidence remains unchanged. After credits were added and the unrelated preflight tests were
+hardened, a separately authorized second attempt succeeded without prompt or production changes.
+The real model selected fill → Search → Account Information → read Savings → finish. All four UI
+actions passed policy; live-source finish verification passed. Discovery took 21.134 seconds and
+fresh replay took 484 ms. Every replay target resolved at strategy index 0; all four checkpoint
+events matched. No retries, rejected proposals, human intervention or artifact repair occurred.
+
+This validates one controlled happy path and a second fake input, not general UI robustness or
+tenant portability. Both image and semantic observations were sent; this trace cannot isolate
+the contribution of visual reasoning. Raw screenshots/logs remain ignored and unredacted.
 
 ## Remaining roadmap
 
-1. Review the first attempt's HTTP 429 and resolve its API limit/quota cause before authorizing another run.
-2. Complete the genuine discovery → compile → different-input replay proof and publish reviewed
-   evidence; the current safe bundle records failure, not successful model discovery.
-3. Add production evidence redaction/retention and authenticated artifact approval.
-4. Extend compilation only for demonstrated business/recovery branches; happy-path discovery does
+1. Review the generated draft and acceptance evidence before selecting the next implementation slice;
+   any further paid discovery run requires separate authorization.
+2. Add production evidence redaction/retention and authenticated artifact approval.
+3. Extend compilation only for demonstrated business/recovery branches; happy-path discovery does
    not invent MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture.
-5. Add explicit, checkpoint-verified continuation after human review if the submission needs it.
+4. Add explicit, checkpoint-verified continuation after human review if the submission needs it.
 
 The earlier `member-savings.ts` runner remains as the original adapter regression fixture; `npm run
 demo` uses the saved artifact and generic coordinator. Recovery never repeats an uncertain original

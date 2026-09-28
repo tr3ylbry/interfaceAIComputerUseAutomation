@@ -1,0 +1,212 @@
+{
+  "schemaVersion": "1.1",
+  "capability": {
+    "id": "discovered.member-savings",
+    "version": "0.1.0",
+    "name": "Member savings inquiry",
+    "description": "Read the savings balance for the supplied member.",
+    "approvalState": "draft"
+  },
+  "target": {
+    "application": "LegacyCore Demo",
+    "surfaceKind": "web",
+    "entryPoint": "http://127.0.0.1:60853/member-search"
+  },
+  "inputs": [
+    {
+      "name": "member_id",
+      "type": "string",
+      "description": "Fake member identifier",
+      "required": true,
+      "sensitive": true
+    }
+  ],
+  "outputs": [
+    {
+      "name": "savings_balance",
+      "type": "currency",
+      "description": "Savings available balance",
+      "required": true,
+      "sensitive": true
+    }
+  ],
+  "targets": [
+    {
+      "id": "target-0",
+      "description": "Verified fill control",
+      "strategies": [
+        {
+          "kind": "relative",
+          "anchorText": "Member No.",
+          "relation": "nearest",
+          "controlHint": "input",
+          "ordinal": 1
+        },
+        {
+          "kind": "selector",
+          "engine": "css",
+          "selector": "input[name=\"memberNumber\"]"
+        }
+      ]
+    },
+    {
+      "id": "target-1",
+      "description": "Verified click control",
+      "strategies": [
+        {
+          "kind": "accessibility",
+          "role": "button",
+          "name": "Search",
+          "exact": true
+        },
+        {
+          "kind": "selector",
+          "engine": "css",
+          "selector": "html:nth-of-type(1) > body:nth-of-type(1) > main:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(1) > form:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(3) > td:nth-of-type(2) > input:nth-of-type(1)"
+        }
+      ]
+    },
+    {
+      "id": "target-2",
+      "description": "Verified click control",
+      "strategies": [
+        {
+          "kind": "accessibility",
+          "role": "link",
+          "name": "Account Information",
+          "exact": true
+        },
+        {
+          "kind": "text",
+          "text": "Account Information",
+          "exact": true
+        },
+        {
+          "kind": "selector",
+          "engine": "css",
+          "selector": "html:nth-of-type(1) > body:nth-of-type(1) > main:nth-of-type(1) > p:nth-of-type(1) > a:nth-of-type(1)"
+        }
+      ]
+    },
+    {
+      "id": "target-3",
+      "description": "Verified read control",
+      "strategies": [
+        {
+          "kind": "relative",
+          "anchorText": "Savings",
+          "relation": "nearest",
+          "controlHint": "value",
+          "ordinal": 1
+        },
+        {
+          "kind": "selector",
+          "engine": "css",
+          "selector": "html:nth-of-type(1) > body:nth-of-type(1) > table:nth-of-type(1) > tbody:nth-of-type(1) > tr:nth-of-type(2) > td:nth-of-type(2) > span:nth-of-type(1)"
+        }
+      ],
+      "framePath": [
+        "iframe[name=\"accountPane\"]"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "step-0",
+      "description": "Discovered fill action",
+      "risk": "reversible_write",
+      "checkpoint": {
+        "timeoutMs": 5000,
+        "kind": "element_state",
+        "targetId": "target-1",
+        "state": "visible"
+      },
+      "action": "fill",
+      "targetId": "target-0",
+      "value": {
+        "source": "input",
+        "name": "member_id"
+      },
+      "clearFirst": true
+    },
+    {
+      "id": "step-1",
+      "description": "Discovered click action",
+      "risk": "read_only",
+      "checkpoint": {
+        "timeoutMs": 5000,
+        "kind": "element_state",
+        "targetId": "target-2",
+        "state": "visible"
+      },
+      "action": "click",
+      "targetId": "target-1"
+    },
+    {
+      "id": "step-2",
+      "description": "Discovered click action",
+      "risk": "read_only",
+      "checkpoint": {
+        "timeoutMs": 5000,
+        "kind": "element_state",
+        "targetId": "target-3",
+        "state": "visible"
+      },
+      "action": "click",
+      "targetId": "target-2"
+    },
+    {
+      "id": "step-3",
+      "description": "Discovered read action",
+      "risk": "read_only",
+      "action": "extract",
+      "targetId": "target-3",
+      "outputName": "savings_balance",
+      "extraction": "text",
+      "transform": "currency_to_number"
+    }
+  ],
+  "businessOutcomes": [],
+  "recoveryPolicies": [],
+  "runtimeConditions": [],
+  "successCondition": {
+    "kind": "all",
+    "conditions": [
+      {
+        "timeoutMs": 1,
+        "kind": "output",
+        "outputName": "savings_balance",
+        "operator": "defined"
+      },
+      {
+        "timeoutMs": 5000,
+        "kind": "element_state",
+        "targetId": "target-3",
+        "state": "visible"
+      }
+    ]
+  },
+  "policy": {
+    "allowedOrigins": [
+      "http://127.0.0.1:60853"
+    ],
+    "allowedPathPatterns": [
+      "/member-search",
+      "/members/*",
+      "/frames/accounts/*"
+    ],
+    "allowedActions": [
+      "navigate",
+      "click",
+      "fill",
+      "select",
+      "extract"
+    ],
+    "irreversibleActionPolicy": "require_human"
+  },
+  "provenance": {
+    "discoveryRunId": "aafa19ac-42a4-4550-b25b-7d57b4589c66",
+    "createdAt": "2026-09-28T17:48:06.114Z",
+    "compilerVersion": "0.2.0"
+  }
+}
