@@ -1,8 +1,36 @@
 # Evidence
 
-This directory documents the evidence boundary. **No genuine OpenAI discovery run has been
-preserved yet: live API credentials were unavailable.** Passing scripted-model tests are engineering
-evidence, not proof of a real model choosing UI actions. The example capability is hand-authored.
+This directory documents the evidence boundary. **The first genuine OpenAI attempt failed with
+HTTP 429 before any model decision.** Its raw evidence remains ignored and a reviewed metadata-only
+summary is available below. Passing scripted-model tests are engineering evidence, not proof of a
+real model choosing UI actions. The example capability remains hand-authored.
+
+## First attempt: provider failure, not successful discovery
+
+Run `92eb2d6e-cdba-47e9-9051-bb442492f466` used the unchanged integration command, configured
+gpt-6-astra/medium, a present local key and a clean baseline with 126/126 passing tests. From
+23:53:25.898Z to 23:53:27.996Z on 2026-09-27 it opened the proxy, captured one screenshot and nine
+semantic elements, then stopped at `provider_http_429`. One provider request was attempted, zero
+decisions were returned, and no UI action, finish, artifact or replay occurred. No retry was made.
+
+The original files remain unchanged under ignored `runtime/discovery/<run-id>/`:
+`discovery-run.raw.json`, `observation-0.png`, and `tool-trace.sanitized.json`. The screenshot shows
+only the blank fake member-search screen. Byte checks found no configured key, credential patterns,
+authorization headers or absolute local paths in these files; the raw log still contains declared
+sensitive fake inputs and is not approved for publication.
+
+The public candidate bundle contains only
+[`review-manifest.json`](discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/review-manifest.json),
+a manually reviewed metadata summary with hashes of the unchanged originals. It omits input values,
+URLs, control text/refs, absolute local paths and provider bodies. It is **not** an automatically
+generated success manifest, signed provider attestation or generated capability. Request count and
+configuration are identified as derived from the executed code path; the failure log itself only
+stores returned decisions, which were zero.
+
+The provider's 429 subtype, request ID and Retry-After were discarded by the existing adapter.
+Do not label this definitively as transient rate limiting or insufficient credits. No model mistake,
+semantic-vs-visual strategy, target normalization or cross-member generalization can be assessed
+from a response that returned no action. Success evidence is still outstanding.
 
 ## Explicit real-run command
 
