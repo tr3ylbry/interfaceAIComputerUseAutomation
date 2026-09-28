@@ -9,8 +9,10 @@ The system is designed around a simple product boundary:
 ## Current status
 
 The core contracts, browser adapter, generic deterministic replay, bounded discovery coordinator,
-OpenAI provider adapter and artifact compiler are implemented. **Live OpenAI discovery remains
-unverified: API credentials were unavailable.** Offline tests use scripted models or mocked transport.
+OpenAI provider adapter and artifact compiler are implemented. **The first genuine API attempt
+returned HTTP 429 before any model decision.** No live-discovered capability or different-input
+replay resulted. The reviewed failure is preserved under
+`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`; offline tests still pass 126/126.
 
 Implemented contract layer:
 
@@ -157,10 +159,17 @@ The browser-backed **scripted-model** test proves fill → Search → Account In
 compilation and different-input model-free replay. It is not proof that a real model chose those actions.
 Normal tests need no API key/network access beyond the local browser fixtures.
 
+The first live attempt used this command unchanged, with a present key and the requested model.
+It made one API request and did not retry. The provider adapter records only the HTTP status on
+failure, so `provider_http_429` alone cannot distinguish rate limiting from quota/billing limits.
+Check the associated project's API limits/billing before authorizing another attempt. No prompt
+change is justified by this result because the model returned no action.
+
 ## Remaining roadmap
 
-1. Supply API credentials and run the genuine discovery → compile → different-input replay proof.
-2. Review and publish a safe evidence bundle from that real run; no live proof is claimed yet.
+1. Review the first attempt's HTTP 429 and resolve its API limit/quota cause before authorizing another run.
+2. Complete the genuine discovery → compile → different-input replay proof and publish reviewed
+   evidence; the current safe bundle records failure, not successful model discovery.
 3. Add production evidence redaction/retention and authenticated artifact approval.
 4. Extend compilation only for demonstrated business/recovery branches; happy-path discovery does
    not invent MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture.

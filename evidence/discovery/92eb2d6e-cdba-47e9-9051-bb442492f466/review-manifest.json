@@ -1,0 +1,71 @@
+{
+  "kind": "post_run_review_not_provider_transcript",
+  "runId": "92eb2d6e-cdba-47e9-9051-bb442492f466",
+  "baselineCommit": "7c2eae562b282aa4c8a55b7546de4578b61d89f3",
+  "baseline": { "workingTreeClean": true, "keyPresent": true, "typecheck": "passed", "testsPassed": 126 },
+  "provider": "openai-responses",
+  "requestedModel": "gpt-6-astra",
+  "requestedReasoningEffort": "medium",
+  "requestConfigurationSource": "unchanged provider adapter at baseline commit",
+  "store": false,
+  "parallelToolCalls": false,
+  "strictFunctionTools": true,
+  "genuineApiAttempt": true,
+  "genuineModelChosenWorkflow": false,
+  "startedAt": "2026-09-27T23:53:25.898Z",
+  "finishedAt": "2026-09-27T23:53:27.996Z",
+  "coordinatorDurationMs": 2098,
+  "status": "failure",
+  "code": "provider_http_429",
+  "modelTurns": {
+    "attempted": 1,
+    "returnedDecisions": 0,
+    "basis": "Provider HTTP failure at the first decide call; no retry path and no repeated CLI invocation. The existing failure log does not persist a separate request counter."
+  },
+  "observations": { "count": 1, "structuredElementCount": 9, "screenshotCount": 1 },
+  "toolSequence": [],
+  "executedActions": [],
+  "selectedControls": [],
+  "actionPolicyDecisions": [],
+  "openingPolicy": "Passed, inferred from reaching the initial observation; no separate opening-policy event is persisted by discovery.",
+  "rejectedProposals": [],
+  "intervention": null,
+  "extractedOutputs": {},
+  "finishVerification": "not_reached",
+  "artifact": { "generated": false, "path": null, "schemaValidation": "not_applicable" },
+  "replay": {
+    "attempted": false,
+    "reason": "Discovery failed before returning any decision; no generated artifact exists.",
+    "result": null,
+    "output": null,
+    "modelCalls": 0,
+    "locatorStrategiesUsed": [],
+    "checkpointResults": []
+  },
+  "providerError": {
+    "httpStatus": 429,
+    "subtype": null,
+    "requestId": null,
+    "retryAfter": null,
+    "limitation": "The existing adapter cancels non-success response bodies and retains only HTTP status. Rate limiting cannot be distinguished from billing, spend or quota limits from this evidence. No model refusal was recorded; no model output was available."
+  },
+  "implementationChanges": false,
+  "promptChanges": false,
+  "automaticRetries": 0,
+  "manualRetries": 0,
+  "originalEvidence": [
+    { "file": "discovery-run.raw.json", "redacted": false, "bytes": 6525, "sha256": "50a0a94675650a826b4dbb7c28b365b8f9df725693045778cbe4050de22df33e" },
+    { "file": "observation-0.png", "redacted": false, "bytes": 17132, "sha256": "0762fbca1a23ddad54dd65652310eabeb2cf544dda0fe4795bbcd6c79d3aa35f" },
+    { "file": "tool-trace.sanitized.json", "redacted": true, "bytes": 209, "sha256": "136932dad5cf4524bc9a75bb3e5c0c03adc21e1f3ac3b322d81105bc396816ed" }
+  ],
+  "publicationReview": {
+    "publicContent": "Manually reviewed metadata-only summary; no invocation values, URLs, control refs/text, provider response bodies or absolute local paths.",
+    "rawEvidenceRemainsIgnored": true,
+    "originalEvidenceUnchanged": true,
+    "configuredKeyFoundInEvidence": false,
+    "credentialPatternsOrAuthorizationHeadersFound": false,
+    "absoluteLocalPathsFound": false,
+    "screenshotVisuallyReviewed": true,
+    "limitation": "Review of this specific fake-data run, not a general redaction guarantee or authenticated provider attestation."
+  }
+}

@@ -6,8 +6,11 @@ validated ReplayResult. Playwright stays inside its adapter. The demo's saved ar
 member 12345's savings balance as 4321.09. Bounded discovery and compilation now exist in
 `src/discovery/`, with an isolated OpenAI Responses adapter configured for gpt-6-astra. Each turn
 combines a live screenshot and compact semantic snapshot and proposes one strict tool action.
-**No genuine API discovery has yet run: credentials were unavailable.** Scripted-model browser
-tests prove compilation followed by fresh model-free replay for member 67890, returning 8765.43.
+The first genuine API attempt (run `92eb2d6e-cdba-47e9-9051-bb442492f466`) returned HTTP 429 before
+any model decision: one request, zero UI actions, 2.098 seconds, no artifact or replay. Its reviewed
+failure manifest is under `evidence/discovery/`. Scripted-model browser tests separately prove
+compilation followed by fresh model-free replay for member 67890, returning 8765.43; that result
+must not be presented as a successful live-LLM run.
 
 # 2. Artifact schema
 
@@ -72,6 +75,8 @@ auxiliary pages/service workers, and unguarded non-document/browser-internal tra
 safety claim. Discovery is semantic-only (no coordinate fallback); current compilation supports
 linear successful paths and exact scalar input substitution, not arbitrary value interpolation or
 branch discovery. A typed value read from a live source is necessary, but does not prove that an LLM
-selected the semantically correct account. The next task is to supply credentials and run the
-explicit real discovery → compile → different-member replay integration once, inspect the result,
-and preserve a safe evidence bundle. Until then the central live-LLM acceptance proof remains open.
+selected the semantically correct account. The first live run exposed a diagnostic limitation:
+non-success provider bodies/headers are discarded, so HTTP 429 cannot be classified further from
+the saved evidence. Next review the project's API limits/billing and, if approved, add only safe
+provider error metadata before a separately authorized attempt. No code/prompt change or retry was
+made for this first-run review. The central successful live-LLM acceptance proof remains open.

@@ -1,6 +1,6 @@
 # ADR-008: Typed discovery with strict direct model tools
 
-**Status:** Accepted and implemented; live API proof pending credentials.
+**Status:** Accepted and implemented; first live attempt stopped at HTTP 429, successful proof pending.
 
 ## Context
 
@@ -59,8 +59,9 @@ evidence writer), `src/adapters/discovery-observation.ts`, the SurfaceAdapter ex
 `src/vertical-slice/run-discovery.ts`. `tests/discovery.test.ts` tests bounds, policy, approval,
 finish verification and normalization; provider tests inspect exact Responses payloads; browser
 tests verify real screenshots/refs, generated artifact replay on member 67890 and handoff.
-No genuine API run occurred: no OPENAI_API_KEY was available. Mocked payload conformance is not
-evidence of model access, live API acceptance or actual model-chosen workflow success.
+At implementation validation, no genuine API run occurred because no OPENAI_API_KEY was available.
+Mocked payload conformance is not evidence of model access, live API acceptance or actual
+model-chosen workflow success. The subsequent first attempt is recorded below.
 
 Two failed approaches informed validation: whole-outerHTML freshness checks changed under browser
 instrumentation, so freshness compares semantic/action-bearing fields instead; a one-millisecond
@@ -79,3 +80,24 @@ References: [Responses function calling](https://developers.openai.com/api/docs/
 [data controls](https://developers.openai.com/api/docs/guides/your-data).
 Revisit for poorer surfaces, adversarial UI content, richer parameterization, conditional discovery,
 production redaction, multi-tenant approval or another provider/surface implementation.
+
+## First genuine attempt — 2026-09-27
+
+Run `92eb2d6e-cdba-47e9-9051-bb442492f466` used unchanged code/prompts at commit
+`7c2eae562b282aa4c8a55b7546de4578b61d89f3`, after clean status, a positive key-presence check and
+126 passing tests. The initial screenshot/semantic snapshot was captured and the first Responses
+request returned HTTP 429. There were no returned decisions, UI actions, outputs, finish checks,
+compiled artifact or replay. No retry or provider/model substitution occurred.
+
+The provider choice is neither validated nor disproved as a workflow model by this result. The
+failure stop and raw/sanitized evidence separation worked. A diagnostic tradeoff is now concrete:
+discarding all error bodies avoids leaking provider content but also loses the safe subtype needed
+to distinguish a temporary rate limit from credit/spend/quota issues. Request ID and Retry-After
+were not retained either. These facts cannot be reconstructed from the saved evidence.
+
+Recommended follow-up, not implemented: inspect account/project limits and review a small allowlist
+of safe error codes/request metadata for future diagnostics, without persisting raw bodies or
+headers. No model prompt/tool changes are supported by this attempt because no proposal was returned.
+The existing one-attempt policy remains. See the reviewed metadata-only failure manifest under
+`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. OpenAI documents multiple
+[HTTP 429 causes](https://developers.openai.com/api/docs/guides/error-codes); status alone is insufficient.

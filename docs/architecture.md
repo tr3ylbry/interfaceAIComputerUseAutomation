@@ -75,8 +75,10 @@ demonstrated; the existing manually authored example continues to test those rep
 `run-discovery.ts` uses no saved capability as input. On real completion it saves a draft and invokes
 the existing generic replay on a fresh session with another fake member. Offline browser tests
 prove this pipeline with a scripted model (12345 → 4321.09, then 67890 → 8765.43, zero replay model
-calls). The real provider request/decision path is implemented but not integration-verified without
-credentials. No live discovery artifact or run is claimed.
+calls). The first genuine provider request returned HTTP 429 before a decision (run
+`92eb2d6e-cdba-47e9-9051-bb442492f466`); no generated artifact or live-discovery replay resulted.
+This confirms failure stopping/evidence capture, not the model's workflow capability. Architecture
+and prompts remain unchanged pending review; success with a real model remains unverified.
 
 ## Implemented vertical slice
 

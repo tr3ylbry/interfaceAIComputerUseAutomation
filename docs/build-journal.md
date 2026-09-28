@@ -236,3 +236,75 @@ requires consent; `store: false` does not establish provider zero retention.
 Next: supply OPENAI_API_KEY securely, run `npm run discover` once, inspect the model-chosen actions
 and emitted draft, verify the fresh 67890 replay/model-call delta, then publish only reviewed safe
 evidence and update these claims from that real run. Do not replace this proof with the scripted test.
+
+## 2026-09-27 — First genuine OpenAI attempt: HTTP 429 before any decision
+
+### Baseline and attempt discipline
+
+Baseline commit: `7c2eae562b282aa4c8a55b7546de4578b61d89f3`. Git was clean; a local key was present
+(value never printed); `npm run typecheck` and all 126 tests passed. Ran `npm run discover` exactly
+once. No implementation, configuration, prompt, tool schema or generated artifact was changed
+before or after the attempt. The command started the controlled fake-data proxy itself.
+
+### Actual result
+
+- Run ID: `92eb2d6e-cdba-47e9-9051-bb442492f466`.
+- Requested provider/model: OpenAI Responses / gpt-6-astra, medium reasoning, `store: false`, strict
+  direct tools, parallel calls disabled; configuration verified in unchanged source.
+- Run interval: `2026-09-27T23:53:25.898Z` → `2026-09-27T23:53:27.996Z`: 2,098 ms, including browser
+  opening/observation/cleanup but excluding the CLI build.
+- Initial hybrid observation: one viewport PNG and nine structured elements on Member Inquiry.
+  The member textbox was empty, with imperfect naming but useful Member No. row context; Search
+  had a button name. These were observed controls, not controls selected by the model.
+- First actual provider request returned HTTP 429; terminal code `provider_http_429`.
+- Attempted model turns: one, inferred from failure at the first decide call and the no-retry code
+  path. Returned model decisions: zero. Exact tool/action sequence: empty.
+- Opening passed policy (inferred from reaching observation); no per-action policy decision,
+  blocked/rejected proposal or human intervention occurred because no proposal existed.
+- No output was extracted; finish verification was not reached. No capability was generated or
+  validated. Replay for member 67890 was not attempted, so there is no ReplayResult/balance,
+  locator/checkpoint evidence or cross-input success claim. Replay model calls: zero because no
+  replay occurred, not because a successful replay was demonstrated.
+
+### First-run review and limitations
+
+The application reached the Responses endpoint and preserved its failure rather than silently
+retrying. No model workflow choice, semantic-vs-visual strategy, ambiguous proposal, actual-control
+target derivation, input parameterization, output typing, artifact reviewability or artifact
+generalization can be evaluated from this run. Existing scripted tests are not a substitute.
+
+The adapter intentionally cancels non-success bodies and records only HTTP status. This kept raw
+provider content out of evidence, but discarded error subtype, request ID and Retry-After. OpenAI
+documents both temporary rate limits and credit/spend/quota causes for HTTP 429; the observed
+status alone does not identify which happened. No model refusal was recorded; there was no model
+output to inspect. This is a provider failure, not evidence of a prompt or UI-policy defect.
+
+The provider/model choice remains unvalidated for successful discovery, not rejected. No prompt or
+tool changes are justified yet. A narrowly allowlisted provider-error metadata record would improve
+future diagnosis, but was only recommended, not implemented during this evidence review.
+
+### Evidence and documentation
+
+The untouched ignored run directory contains `discovery-run.raw.json` (6,525 bytes),
+`observation-0.png` (17,132 bytes) and `tool-trace.sanitized.json` (209 bytes, empty turns/actions).
+The screenshot was visually inspected: blank fake member-search UI, no unrelated app content.
+Checks against the configured key plus credential/header/path patterns found no secret or absolute
+local path in these files. Raw records still contain declared sensitive fake inputs and stay ignored.
+
+Added a reviewed metadata-only `evidence/discovery/<run-id>/review-manifest.json`, recording exact
+original hashes, request-count inference, failure and skipped stages. It contains no input values,
+control refs/text, response bodies, application URLs or machine-specific paths. It is a post-run
+review, not the CLI's generated success manifest or a provider transcript. Original evidence was
+not repaired or overwritten; nothing was force-added to Git.
+
+Updated README/current status, REPORT, architecture's evidence status, ADR-008, this journal,
+evidence README and ignored local interview notes. Historical implementation entries remain intact.
+No source/tests/dependencies changed. Documentation and reviewed public evidence are left uncommitted
+for first-run review; this phase did not request a commit or push.
+
+### Next step
+
+Inspect the configured project's API billing/limits to distinguish transient rate limiting from
+quota/credit/spend restrictions. Review the proposed safe diagnostic metadata improvement before
+changing code. Only after the cause is addressed and another attempt is explicitly authorized,
+repeat the unchanged canonical request and keep this failed first run alongside subsequent evidence.
