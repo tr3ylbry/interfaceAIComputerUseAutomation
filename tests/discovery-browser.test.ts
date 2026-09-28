@@ -12,6 +12,9 @@ describe("discovery surface and compilation (scripted model, not live API eviden
   beforeAll(async () => { server = await startLegacyBankServer(); });
   afterAll(async () => { await server.close(); });
 
+  // Two Chromium lifecycles plus five screenshot/semantic observations can exceed 5s
+  // under parallel browser-suite load. Only this integration test gets a larger budget;
+  // adapter action deadlines and discovery/replay assertions remain unchanged.
   it("compiles observed controls, then replays on a fresh session with a different member and no model calls", async () => {
     let turn = 0;
     const model = { identity: { provider: "scripted-test", model: "no-network" }, decide: vi.fn<DiscoveryModel["decide"]>().mockImplementation(async observation => {
@@ -49,7 +52,7 @@ describe("discovery surface and compilation (scripted model, not live API eviden
     const replay = await new ReplayCoordinator(new PlaywrightSurfaceAdapter(), { allowDraft: true }).run(JSON.parse(JSON.stringify(artifact)), { member_id: "67890" });
     expect(replay).toMatchObject({ status: "success", outputs: { savings_balance: 8765.43 } });
     expect(model.decide).toHaveBeenCalledTimes(5);
-  });
+  }, 15_000);
 
   it("expires observation refs after observation replacement and action execution", async () => {
     const adapter = new PlaywrightSurfaceAdapter();

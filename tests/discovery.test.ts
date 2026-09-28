@@ -80,20 +80,50 @@ describe("bounded discovery", () => {
     expect(() => compileDiscovery(run)).toThrow("no_value_independent_locator");
   });
 
-  it("labels raw evidence honestly and emits a value-free tool trace", async () => {
-    const { request, coordinator } = setup();
+  it.each([
+    { metadata: "generated run ID", runId: undefined },
+    // Reproduce the old whole-JSON substring assertion's false positive deterministically.
+    { metadata: "unrelated run ID containing 4321 and 12345", runId: "ba6edb58-d1c0-4321-97e8-4dd1ea212345" },
+  ])("labels raw evidence honestly and emits a value-free tool trace ($metadata)", async ({ runId }) => {
+    const sensitiveInput = "SENSITIVE_TEST_VALUE_4321";
+    const { request, coordinator } = setup([
+      { kind: "ui_fill", targetRef: "control-0", value: sensitiveInput },
+      { kind: "ui_read", targetRef: "control-1", outputName: "savings_balance", extraction: "text" },
+      { kind: "finish_discovery" },
+    ]);
+    request.inputs[0]!.discoveryValue = sensitiveInput;
     const run = await coordinator.run(request);
+    expect(run.status).toBe("success");
+    if (runId) run.id = runId;
     const directory = await mkdtemp(join(tmpdir(), "discovery-evidence-test-"));
     try {
       await writeDiscoveryEvidence(run, directory);
       const raw = JSON.parse(await readFile(join(directory, "discovery-run.raw.json"), "utf8"));
       expect(raw.redacted).toBe(false);
-      expect(raw.request.inputs[0].discoveryValue).toBe("12345");
+      expect(raw.request.inputs[0].discoveryValue).toBe(sensitiveInput);
+      expect(raw.actions[0].decision.value).toBe(sensitiveInput);
+      expect(raw.outputs.savings_balance).toMatchObject({ value: 4321.09, rawValue: "$4,321.09" });
       expect(raw.observations[0]).toMatchObject({ screenshotPath: "observation-0.png", redacted: false });
       expect(raw.observations[0]).not.toHaveProperty("image");
-      const trace = await readFile(join(directory, "tool-trace.sanitized.json"), "utf8");
-      expect(trace).not.toMatch(/12345|4321|4,321|localhost|goal|discoveryValue|fake-image/);
-      expect(JSON.parse(trace)).toMatchObject({ redacted: true, turns: [{ tool: "ui_read" }, { tool: "finish_discovery" }] });
+      const trace = JSON.parse(await readFile(join(directory, "tool-trace.sanitized.json"), "utf8"));
+      // Exact nested shape rejects added payload fields or values, including input arguments,
+      // outputs, control evidence, goals, URLs and images, without scanning unrelated IDs.
+      expect(trace).toStrictEqual({
+        runId: run.id,
+        model: { provider: "scripted-test", model: "no-network" },
+        redacted: true,
+        status: "success",
+        turns: [
+          { turn: 1, tool: "ui_fill", observationId: "observation-0" },
+          { turn: 2, tool: "ui_read", observationId: "observation-1" },
+          { turn: 3, tool: "finish_discovery", observationId: "observation-2" },
+        ],
+        actions: [
+          { index: 0, tool: "ui_fill", policy: "allow", executed: true },
+          { index: 1, tool: "ui_read", policy: "allow", executed: true },
+        ],
+      });
+      expect(JSON.stringify(trace)).not.toContain(sensitiveInput);
       if (process.platform !== "win32") expect((await stat(join(directory, "discovery-run.raw.json"))).mode & 0o777).toBe(0o600);
     } finally { await rm(directory, { recursive: true, force: true }); }
   });

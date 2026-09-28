@@ -308,3 +308,60 @@ Inspect the configured project's API billing/limits to distinguish transient rat
 quota/credit/spend restrictions. Review the proposed safe diagnostic metadata improvement before
 changing code. Only after the cause is addressed and another attempt is explicitly authorized,
 repeat the unchanged canonical request and keep this failed first run alongside subsequent evidence.
+
+## 2026-09-28 — Harden the tests that blocked attempt #2
+
+Attempt #2 stopped at preflight: typecheck passed but 124/126 tests passed. No live provider call
+occurred and no second discovery run exists. This session fixes only the two failing tests;
+production code, prompts, provider configuration, runtime deadlines and architecture are unchanged.
+
+### Sanitized evidence assertion
+
+The writer already projects an explicit allowlist of trace fields. The old test searched the entire
+serialized trace for short numeric substrings, so an unrelated random run UUID containing `4321`
+triggered a false positive. This was an assertion defect, not an observed sanitization leak.
+
+The test now parses the persisted trace and checks its complete nested shape with `toStrictEqual`.
+Extra fields, changed values, tool arguments, outputs, control evidence, goals, URLs or images
+therefore fail the assertion. A distinctive authorized input sentinel is filled and confirmed in
+raw evidence but absent from the sanitized trace; raw and numeric output values are also verified
+in the raw record. A second case fixes the run UUID to contain both `4321` and `12345`, proving
+unrelated metadata does not cause a false alarm. Raw labeling and file-permission checks remain.
+
+### Browser timing investigation
+
+The unchanged scripted discovery/compile/fresh-replay test passed alone in 2,106 ms. Temporary
+adapter-stage instrumentation measured 2,123 ms alone versus 5,771 ms under the full suite's
+parallel browser load. Five screenshot/semantic observations took 789 ms in total alone versus
+2,525 ms under load; the two browser opens took 705 ms versus 986 ms. Finish verification,
+locator resolution, replay checkpoints and both browser closes completed. The full-suite test
+deadline expired while replay was still progressing, not while waiting on one stuck control.
+
+Inspection found no arbitrary sleep or simulated busy-state backoff on this happy path. Server
+startup is awaited in `beforeAll`; page navigation/action readiness and checkpoints are already
+explicitly awaited. The evidence points to cumulative browser/protocol work under contention,
+not a missing readiness condition. Initial temporary timing spies accidentally wrapped themselves;
+they were corrected before collecting these measurements and all instrumentation was then removed.
+
+Only this two-browser integration test now has a 15-second test-runner budget, allowing headroom
+for parallel load while retaining a finite failure deadline. The 5-second per-action runtime
+timeouts and all existing assertions remain unchanged. Global timeout inflation, arbitrary waits
+and production timing changes were rejected because they would not address the measured cause.
+No ADR is needed: this is test-budget calibration, not a system-boundary change.
+
+### Validation and next step
+
+- `npm run typecheck`: passed.
+- Sanitization test individually: both generated-ID and fixed-ID cases passed.
+- Scripted browser test: five consecutive isolated runs passed (2,244 / 1,892 / 1,800 / 2,023 /
+  2,010 ms).
+- Three consecutive `npm test` runs: 127/127 passed each. The same integration test took 6,195 /
+  5,525 / 6,309 ms under normal parallel load, confirming that five seconds was too tight even
+  without diagnostic instrumentation.
+- Diff review: only the two test files and this journal changed; no raw evidence, credentials,
+  generated artifacts, dependencies or production files are included.
+
+No OpenAI API request or `npm run discover` was run. Existing first-attempt 429 evidence remains
+unchanged. The test blockers are resolved; the next step is explicit authorization for exactly one
+live discovery attempt, with the usual clean-branch/typecheck/test preflight. Passing scripted
+tests still does not prove that genuine discovery or different-input replay will succeed.
