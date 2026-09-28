@@ -29,6 +29,7 @@ import type {
   ValueExpression,
 } from "../contracts/index.js";
 import { NavigationPolicyError } from "../contracts/index.js";
+import { assertPrivateEvidenceDestination } from "../evidence/private-destination.js";
 import { NavigationFirewall } from "./navigation-firewall.js";
 import { DiscoveryObservation } from "./discovery-observation.js";
 
@@ -408,6 +409,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     kinds: Array<"screenshot" | "trace" | "dom_snapshot" | "accessibility_snapshot">,
   ): Promise<EvidenceRef[]> {
     const state = this.getState(session);
+    await assertPrivateEvidenceDestination(this.evidenceDirectory);
     await mkdir(this.evidenceDirectory, { recursive: true });
     const capturedAt = new Date().toISOString();
     const stem = `${session.id}-${Date.now()}`;

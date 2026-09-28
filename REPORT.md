@@ -72,6 +72,13 @@ Screenshots are raw and model processing needs explicit caller consent. Response
 and disables parallel calls; this does not promise zero provider retention. Model refusals, invalid
 decisions, deadlines and step exhaustion stop rather than trigger hidden retries.
 
+Public submission evidence now has a separate fail-closed publication boundary: explicit structured
+projections, pinned nested allowlists, known-value/credential/local-path rejection, no automatic
+binary publication, and complete-bundle validation before public writes. Raw writers reject public
+evidence destinations. Generated manifests preserve public byte integrity and identify withheld
+sources. The accepted genuine four-file bundle passes these rules without modification. This is
+an application publication gate, not general redaction/DLP, authenticated attestation or retention.
+
 # 7. Cuts
 
 No operator console, queue, database, application service API, desktop adapter, or tenant override
@@ -79,7 +86,8 @@ engine is implemented. Recovery supports declared dismiss clicks and
 checkpoint rechecks. Automatic continuation, production redaction, authenticated artifact approval,
 and broader outbound-data restrictions remain gaps. Chromium protocol dependence, unsupported
 auxiliary pages/service workers, and unguarded non-document/browser-internal traffic limit the
-safety claim. Discovery is semantic-only (no coordinate fallback); current compilation supports
+safety claim. Discovery action targeting is semantic/ref-based (no coordinate fallback), while
+observation is hybrid screenshot plus structured semantic state. Current compilation supports
 linear successful paths and exact scalar input substitution, not arbitrary value interpolation or
 branch discovery. A typed value read from a live source is necessary, but does not prove that an LLM
 selected the semantically correct account. The first live run exposed a diagnostic limitation:
@@ -89,5 +97,5 @@ persisted; five completed decisions are evidenced, not reconstructed provider me
 prompt or architecture change was needed for attempt #2. One controlled happy path and one second
 fake input do not establish broader reliability, adversarial robustness or tenant portability.
 The exact artifact retains its original loopback endpoint; automatic rebinding is not demonstrated.
-Review the accepted evidence/draft before choosing further work. Production evidence handling and
-artifact approval remain the next safety gaps; no further live attempt is implied.
+The evidence/draft has been reviewed and accepted as submission evidence. Production raw-data
+handling and authenticated artifact approval remain safety gaps; no further live attempt is implied.

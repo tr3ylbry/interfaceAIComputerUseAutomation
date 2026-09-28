@@ -465,3 +465,71 @@ Next: review and accept this generated draft/evidence package, then explicitly s
 limited safety slice (production evidence redaction/retention or artifact approval). Do not run
 another paid discovery attempt implicitly. Preserve both attempts and keep the generated happy
 path distinct from the manually authored fixture's business/recovery branches.
+
+## 2026-09-28 — Fail-closed evidence publication
+
+### Goal and flow review
+
+The accepted genuine bundle demonstrated the assignment through-line, but public publication still
+depended on manually projecting/reviewing raw evidence after capture. The discovery writer produced
+raw observations/screenshots plus an allowlisted tool summary in ignored runtime storage; the CLI
+also wrote a raw replay result and manifest with an absolute artifact path. There was no automated
+public replay projection or public writer. Binary publication had only a documented manual boundary.
+
+### Changes and decisions
+
+Added `src/evidence/` with raw/candidate/public types, explicit discovery/replay projections, pinned
+nested publication schemas, content rejection, integrity checks, a validate-before-write publisher
+and a read-only validation command. The existing raw discovery/adapter writers gained only a
+destination guard: public evidence paths and symlink aliases are rejected before persistence.
+Normal ignored raw capture, discovery/replay actions, core contracts and provider settings are unchanged.
+
+ADR-009 records a material persistence trust boundary. Explicit allowlist construction was chosen
+over recursive redaction: unknown fields must not propagate, and generated artifact bytes must not
+be silently repaired. A private inventory supplies known inputs/outputs/credentials; exact scalar and
+token-boundary comparisons preserve the earlier numeric-UUID false-positive lesson. Both formatted
+and transformed outputs belong in that inventory. Field-name checks complement credential patterns.
+
+Review caught two additional publication hazards: duplicate JSON keys can hide unsafe bytes behind
+a safe parsed value, and mutable caller state can change a destination during asynchronous writes.
+The gate therefore requires canonical JSON without duplicate/alternate encodings and snapshots the
+publication request before awaits. It validates the whole bundle before creating the destination,
+refuses overwrites/symlinks, and writes its manifest last. Source hashes remain review assertions,
+not provider attestations. An interrupted I/O write may leave an incomplete but content-validated
+directory; no destructive automatic cleanup or claim of transactional publication was added.
+
+Public binaries/screenshots are prohibited, with no approval-flag bypass. A future binary path
+requires explicit sanitization/manual review. This is deliberately not OCR, general PII discovery,
+raw-data redaction/retention, provider retention control, or a filesystem/Git access-control system.
+Artifact publication is limited to the demonstrated linear web profile; extending core runtime
+contracts cannot silently expand the public schema. Existing historical success metadata has an
+explicit compatibility schema rather than an arbitrary-object exemption.
+
+### Validation and evidence
+
+- Typecheck passes. Added 55 focused publication tests; all 182 tests pass with local browser/server
+  permissions. The first sandboxed full run could not listen on loopback (`EPERM`), so browser hooks
+  failed; the unchanged suite passed when rerun with the required permission. No timeout inflation.
+- Tests cover sensitive input/output and secrets, Authorization/Bearer/cookie/session fields, local
+  paths, normal URLs, unknown fields, binaries, UUID metadata, no-write-on-rejection, duplicate keys,
+  integrity mismatches, no-overwrite, symlink destinations, raw-path guards and unchanged accepted bytes.
+- The read-only publication command validates all four accepted genuine files for run
+  `aafa19ac-42a4-4550-b25b-7d57b4589c66` with the known fake input/output inventory. No accepted
+  evidence was rewritten, including the generated artifact. Both historical attempts remain intact.
+- No live OpenAI call or discovery command occurred. Existing scripted discovery and deterministic
+  replay/browser scenarios pass. No raw files, screenshots, credentials or generated outputs are added.
+
+Updated README import wording and REPORT's semantic-targeting/hybrid-observation wording. Updated
+safety, architecture, evidence guidance, this journal, private ignored defense notes and ADR-009.
+The Notion project record is synchronized with this safety slice; public technical reasoning remains
+self-contained in the repository.
+
+### Remaining limits and next step
+
+The caller must provide a complete inventory. Unknown/encoded secrets, arbitrary PII, manual
+force-add/copy, malicious concurrent local filesystem changes, authenticated review, raw retention
+and model-input privacy are not solved. The historical failed-attempt manifest remains preserved,
+not migrated into the new success-manifest schema. No provider or broader execution redesign.
+
+Next: bind authenticated artifact approval to the exact reviewed capability bytes and policy before
+non-development replay. No further live discovery attempt is authorized by this work.

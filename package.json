@@ -10,6 +10,7 @@
     "demo": "npm run build && node dist/src/vertical-slice/run-demo.js",
     "discover": "npm run build && node dist/src/vertical-slice/run-discovery.js",
     "typecheck": "tsc --noEmit",
+    "evidence:validate": "npm run build && node dist/src/evidence/validate-cli.js",
     "test": "vitest run"
   },
   "dependencies": {

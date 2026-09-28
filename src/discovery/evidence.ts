@@ -1,9 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { DiscoveryRun } from "./contracts.js";
+import { assertPrivateEvidenceDestination } from "../evidence/private-destination.js";
 
 /** Explicit raw persistence for the fake-data integration CLI, never called by normal replay/tests. */
 export async function writeDiscoveryEvidence(run: DiscoveryRun, directory: string): Promise<void> {
+  await assertPrivateEvidenceDestination(directory);
   await mkdir(directory, { recursive: true });
   const observations = [];
   for (const [index, observation] of run.observations.entries()) {

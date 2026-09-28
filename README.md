@@ -15,7 +15,7 @@ artifact → different-input, model-free replay is demonstrated.** Attempt #2, r
 fake member `12345`, then replayed its unchanged artifact for `67890`, returning `8765.43` with
 zero replay model calls. See the [reviewed evidence](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/review-manifest.json).
 The first attempt's HTTP 429 remains preserved under
-`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 127/127.
+`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 182/182.
 
 Implemented contract layer:
 
@@ -57,9 +57,10 @@ SurfaceAdapter execution. The provider is not imported by replay.
 Saved capabilities can now be invoked through `ReplayCoordinator.run(artifact, inputs)`. Replay
 validates inputs, binds expressions in memory, enforces policy, executes declared steps, evaluates
 business outcomes and checkpoints, extracts typed outputs, and returns a validated `ReplayResult`.
-The coordinator imports only contracts and standard Node modules; it contains no bank-specific or
-model logic. Schema 1.1 adds declarative runtime conditions; existing 1.0 artifacts without those
-conditions remain supported. Draft fixtures require an explicit `allowDraft` development option.
+The replay path has no model/provider or bank-specific dependency; it uses contracts, Node modules
+and local replay policy/value/validation modules. Schema 1.1 adds declarative runtime conditions;
+existing 1.0 artifacts without those conditions remain supported. Draft fixtures require an explicit
+`allowDraft` development option.
 
 Browser document navigation is now checked before request egress, including links, forms, frames
 and redirects. Forbidden requests return `policy_violation`; server-counter tests verify that
@@ -181,9 +182,10 @@ the contribution of visual reasoning. Raw screenshots/logs remain ignored and un
 
 ## Remaining roadmap
 
-1. Review the generated draft and acceptance evidence before selecting the next implementation slice;
-   any further paid discovery run requires separate authorization.
-2. Add production evidence redaction/retention and authenticated artifact approval.
+1. The generated evidence bundle is accepted and now passes a fail-closed public publication gate
+   unchanged. See `evidence/README.md` for `npm run evidence:validate` and the explicit publisher API.
+   Any further paid discovery run requires separate authorization.
+2. Add authenticated artifact approval; production raw-data redaction/retention remain separate gaps.
 3. Extend compilation only for demonstrated business/recovery branches; happy-path discovery does
    not invent MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture.
 4. Add explicit, checkpoint-verified continuation after human review if the submission needs it.

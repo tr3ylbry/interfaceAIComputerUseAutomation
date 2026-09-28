@@ -12,6 +12,7 @@ The model discovers. The artifact becomes the reusable capability. Deterministic
 - **Surface adapter** — isolates perception/action mechanics from the artifact and replay contracts.
 - **Policy engine** — evaluates every proposed action before execution.
 - **Evidence recorder** — writes structured events plus richer failure evidence.
+- **Evidence publisher** — constructs allowlisted public projections and validates the complete bundle before persistence.
 - **Intervention coordinator** — pauses automation and transfers the same live session to a human; automatic continuation is not implemented.
 
 ## Dependency direction
@@ -188,3 +189,19 @@ Discovery is intentionally different: its in-memory observations/run contain raw
 Explicit model-processing consent is required. Only the fake-data integration CLI persists these
 records, under ignored `evidence/runtime/discovery/`, marked `redacted: false`; it also produces a
 value-free tool summary. This is not a general redactor or a claim of provider zero retention.
+
+## Separate evidence publication boundary
+
+`src/evidence/publication.ts` defines raw/candidate/public evidence types, explicit discovery/replay
+projections and content rejection. `schemas.ts` pins the public fields, including a deliberately
+narrow web-artifact profile and compatibility schema for the accepted reviewed success manifest.
+Core capability/replay contracts do not change or acquire publication/provider types.
+
+`bundle.ts` checks schema, references, content and integrity before writing any public file. The
+public writer preserves validated JSON bytes, rejects unknown files/binaries and refuses existing
+run directories. A new publication manifest records public hashes/byte counts, reviewed/generated
+timestamps and withheld-source metadata. Historical evidence is validated without rewriting it.
+`validate-cli.ts` provides a read-only command with private inventory on stdin, no model/browser work.
+The discovery/adapter raw writers gain only a public-destination persistence guard; execution,
+provider configuration and normal ignored evidence output remain unchanged. ADR-009 records this
+material trust boundary separately from runtime navigation/action policy.

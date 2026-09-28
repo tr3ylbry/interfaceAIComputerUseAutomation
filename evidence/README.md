@@ -99,8 +99,8 @@ expected second-member replay output (`8765.43`). The key is never included in t
 ## Publication and limitations
 
 Raw records use restrictive file permissions and remain ignored. Do not force-add the runtime
-directory. Review and deliberately sanitize an evidence bundle before copying approved files into
-tracked `evidence/discovery/`; the minimal tool summary alone does not redact screenshots/logs.
+directory. Public evidence must pass the explicit publication boundary described below; do not
+manually copy raw files into tracked directories. The minimal tool summary alone does not redact screenshots/logs.
 Generated artifact endpoints reference that proxy process; no automatic cross-environment rebinding
 or authenticated provenance is claimed. `store: false` is not provider zero-retention assurance.
 
@@ -112,3 +112,55 @@ Future reviewed submission bundles may include:
 - `replay-intervention/` — same-session human handoff evidence.
 
 No real credentials, tokens, or sensitive PII belong here.
+
+## Fail-closed structured publication (ADR-009)
+
+Only evidence that has passed the publication boundary may be written under committed/public
+evidence paths. Raw evidence remains raw: this phase does not change its contents, redact images,
+alter discovery/replay or invoke a model. The accepted attempt #2 bundle remains byte-identical.
+
+The library API in `src/evidence/` is deliberately small:
+
+1. Collect an explicit **private** `SensitiveInventory`: `sensitiveValues` (strings/numbers) and
+   `secretValues` (strings). Include both discovery/replay inputs, formatted and transformed outputs,
+   and known credentials. `inventoryFromRaw` assists using normalized raw records; it is not PII discovery.
+2. Build candidates with `discoveryTrace(run)` and `replayProjection(result, measuredModelCalls)`.
+   These copy only named safe fields, never arbitrary raw objects. Add the original UTF-8 generated
+   capability as `{ filename: "capability.json", utf8 }`; do not repair its bytes to pass validation.
+3. Call `publishEvidenceBundle(repositoryRoot, { runId, reviewedAt, files, sources }, inventory)`.
+   `sources` contains reviewed `{ file, bytes, sha256, withheld }` records; basenames only. Source
+   digests are review inputs, not signed claims. Non-withheld sources must match a public file exactly.
+4. The writer validates **all** candidates and its generated manifest before creating
+   `evidence/discovery/<run-id>/`. It refuses existing bundles, symlinks, unknown fields/files,
+   known values, credential material, common absolute local paths and binaries. Manifest is written
+   last; an I/O-interrupted bundle without a manifest is incomplete, not approved publication.
+
+The new `publication-manifest.json` contains public hashes/byte counts, generated/review timestamps,
+reviewed/validated status and withheld-source metadata. It does not copy the raw CLI manifest.
+The original `review-manifest.json` format remains supported read-only for the accepted success
+bundle; no new provider fields are admitted automatically. Artifact publication currently supports
+the demonstrated linear web profile: no coordinates, object literals or business/recovery branches.
+Unsupported formats fail closed and need a reviewed schema extension, not ad hoc redaction.
+
+To revalidate an existing supported bundle without rewriting it:
+
+```bash
+npm run evidence:validate -- evidence/discovery/<run-id> < evidence/runtime/private-publication-inventory.json
+```
+
+The inventory JSON has exactly `sensitiveValues` and `secretValues` arrays. Keep it ignored/private;
+never pass real secrets as command-line arguments or commit the inventory. The validator also checks
+an already-exported OPENAI_API_KEY if present, but does not load env files or make API calls. Output
+contains filenames/status only; errors contain fixed codes. Canonical two-space JSON (optional final
+newline) is required to reject duplicate keys/alternate encodings without rewriting artifacts.
+
+Screenshots, traces, arbitrary binaries and inline data-URI images are **not supported** by this
+automatic path. A `reviewed: true` flag cannot override that rule. Any future public image needs an
+explicit sanitized/manual review decision and a separate supported publication path; no OCR/image
+redaction infrastructure was added. Withheld screenshot hashes are metadata, not published images.
+
+Limits: caller inventory completeness, unseen/encoded secrets, general PII, raw storage/retention,
+model-input privacy and signed approval are not solved. Numeric token boundaries avoid UUID substring
+false positives; an exact known-value collision can still conservatively reject harmless metadata.
+Normal HTTP URL paths remain permitted; common filesystem-path detection is not general DLP.
+Application guards cannot prevent a local operator bypassing the writer or force-adding raw files.

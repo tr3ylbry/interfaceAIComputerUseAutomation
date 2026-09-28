@@ -74,6 +74,37 @@ names, policy outcomes and execution flags. This selective summary is not a gene
 The compiler filters concrete input/output values and refuses unsafe normalization; generated
 artifacts remain drafts. Provenance and draft approval are not signed/authenticated attestations.
 
+## Public evidence publication boundary
+
+Only evidence that has passed the publication boundary may be written under committed/public
+evidence paths. `src/evidence/` separates raw records, untrusted publication candidates and immutable
+validated public bytes. This does not change UI decisions, replay, prompts or provider settings.
+
+`discoveryTrace` and `replayProjection` construct allowlisted fields; they do not recursively redact
+raw objects. Outputs, invocation arguments, screenshots, provider bodies and free-form replay
+messages/reasons are omitted by construction. The historical reviewed projection may retain its
+explicitly allowlisted reason field, subject to the same content checks. Unknown nested public
+fields fail strict validation. New runtime fields therefore do not automatically become public.
+
+`publishEvidenceBundle` validates the entire bundle before creating its directory. It checks an
+explicit private inventory of known sensitive values and secrets, credential field names and text,
+common macOS/Linux/Windows/UNC/file-URI paths, binary data and schema/integrity consistency. Exact
+scalar/token-boundary checks avoid numeric UUID substring false positives. Ordinary route paths
+and HTTP URL paths are not treated as filesystem paths. Duplicate-key/noncanonical JSON fails;
+errors never print offending values. Existing accepted artifact bytes are preserved, not repaired.
+
+Publication is JSON-only. Screenshots and arbitrary binaries are rejected, even if a caller adds
+an approval flag. Explicit manual sanitization/review of binaries is outside this automatic path;
+their hashes/byte counts may be recorded as withheld sources. No image redaction is claimed.
+The writer refuses overwrites and symlinked public destinations, and writes its generated manifest
+last. Raw discovery/adapter evidence writers reject public evidence destinations before persistence.
+
+This is not production DLP: inventory completeness, raw storage/retention, model-input privacy,
+unknown/encoded credentials, general PII detection and authenticated approval remain outside scope.
+The path guard protects this repository's evidence tree; callers own temporary/external private
+destinations. Local operators can still bypass application APIs or force-add ignored files. See
+ADR-009 and `evidence/README.md` for the supported profile and explicit validation procedure.
+
 ## Navigation request invariant
 
 “No browser request capable of moving the automated session outside its allowed navigation surface
