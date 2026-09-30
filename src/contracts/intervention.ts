@@ -36,6 +36,14 @@ export const HumanActionRecordSchema = z.object({
 
 export type HumanActionRecord = z.infer<typeof HumanActionRecordSchema>;
 
+/** Value-free actions are scoped by intervention and ownership epoch, not browser objects. */
+export type HumanActionRecording = {
+  interventionId: string;
+  epoch: number;
+  actions: HumanActionRecord[];
+  incomplete: boolean;
+};
+
 export const SessionControlStateSchema = z.discriminatedUnion("state", [
   z.object({
     state: z.literal("automation_running"),

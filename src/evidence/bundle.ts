@@ -5,6 +5,7 @@ import { z } from "zod";
 import { PublicationError, validatePublicEvidence, type EvidenceCandidate, type SensitiveInventory, type PublicEvidence } from "./publication.js";
 import { PublicationManifestSchema, ReviewedManifestSchema, PublicTraceSchema, PublicReplaySchema, sourceDigest } from "./schemas.js";
 import { CapabilityArtifactSchema } from "../contracts/index.js";
+import { PublicHandoffSchema } from "./handoff.js";
 
 const requireMatch = (condition: unknown): void => { if (!condition) throw new PublicationError("inconsistent_bundle"); };
 const RequestSchema = z.strictObject({
@@ -27,6 +28,8 @@ export function validateBundle(candidates: EvidenceCandidate[], inventory: Sensi
   const trace = traceFile ? PublicTraceSchema.parse(JSON.parse(traceFile.utf8)) : undefined;
   const replayFile = get("replay.sanitized.json");
   const replay = replayFile ? PublicReplaySchema.parse(JSON.parse(replayFile.utf8)) : undefined;
+  const handoffFile = get("handoff.sanitized.json");
+  const handoff = handoffFile ? PublicHandoffSchema.parse(JSON.parse(handoffFile.utf8)) : undefined;
   if (artifact && trace) requireMatch(artifact.provenance.discoveryRunId === trace.runId);
   if (artifact && replay) {
     requireMatch(artifact.capability.id === replay.capabilityId && artifact.capability.version === replay.capabilityVersion);
@@ -55,6 +58,7 @@ export function validateBundle(candidates: EvidenceCandidate[], inventory: Sensi
     requireMatch(isDeepStrictEqual(manifest.publicFiles.map(file => file.file).sort(), files.filter(file => file !== publication).map(file => file.filename).sort()));
     for (const digest of manifest.publicFiles) requireMatch(digest.bytes === get(digest.file)?.bytes && digest.sha256 === get(digest.file)?.sha256);
     if (trace) requireMatch(trace.runId === manifest.runId);
+    if (handoff) requireMatch(handoff.runId === manifest.runId);
     if (artifact) requireMatch(artifact.provenance.discoveryRunId === manifest.runId);
     for (const source of manifest.sources) {
       if (!source.withheld) requireMatch(source.bytes === get(source.file)?.bytes && source.sha256 === get(source.file)?.sha256);

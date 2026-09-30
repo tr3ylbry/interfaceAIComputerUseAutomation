@@ -15,11 +15,12 @@ artifact → different-input, model-free replay is demonstrated.** Attempt #2, r
 fake member `12345`, then replayed its unchanged artifact for `67890`, returning `8765.43` with
 zero replay model calls. See the [reviewed evidence](evidence/discovery/aafa19ac-42a4-4550-b25b-7d57b4589c66/review-manifest.json).
 The first attempt's HTTP 429 remains preserved under
-`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 182/182.
+`evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 195/195.
 
 Submission audit: the discovery/replay through-line is proven, but **handoff acceptance is incomplete**.
-Manual human-action recording and a demonstrated manual-work → handback → automation completion
-path are still required. See the [requirement matrix](docs/submission-readiness.md).
+The recorder and explicit handback/completion path are implemented and tested with simulated browser
+events. Your personal headed-browser acceptance run is still required. See the
+[requirement matrix](docs/submission-readiness.md) and command below.
 
 Implemented contract layer:
 
@@ -128,6 +129,26 @@ it does not simulate human approval or continue the interrupted run.
 The [published exceptional replay](evidence/discovery/d7727060-ec70-4f74-b4a8-501825698825/replay.sanitized.json)
 preserves a separate model-free `not-found` run, not a learned branch of the generated happy path.
 
+### Personal same-session handoff acceptance
+
+From a graphical desktop and interactive terminal (no API key required):
+
+```bash
+npm run demo:handoff
+```
+
+Wait for “Automation paused”, then personally click **Operator reviewed** in the existing browser.
+Do not navigate away or click Account Information. In the terminal, type **return** and Enter.
+Automation verifies the closed warning, opens Account Information, reads Savings in the iframe and
+prints `Completion SUCCESS: savings_balance = 4321.09`, with the same session and zero model calls.
+Review the displayed value-free candidate, then type **publish** and Enter to publish it, or just
+Enter to keep it private. Ctrl-C/any other handback response aborts; there is no automatic approval.
+
+Raw evidence and the validated candidate stay under `evidence/runtime/handoff/<run-id>/`; explicit
+publication creates `evidence/discovery/<run-id>/handoff.sanitized.json` and a publication manifest,
+without committing them. No screenshots, typed values or arbitrary UI text are published. Report
+your run ID/result before marking genuine-human acceptance proven. See [handoff details and limits](docs/human-handoff.md).
+
 For programmatic use, import `ReplayCoordinator` from `src/replay/index.ts`, construct it with a
 `SurfaceAdapter`, and call `run(savedArtifact, { member_id: "12345" })`. On intervention, retrieve
 the `InterventionRequest`, live session, and runtime context with `getHandoff(interventionId)`.
@@ -200,9 +221,9 @@ the contribution of visual reasoning. Raw screenshots/logs remain ignored and un
 
 ## Remaining acceptance work and deliberate cuts
 
-The next required task is minimal, safely recorded manual work in the same session, followed by
-explicit handback and demonstrated automation completion. Control-transfer events alone do not
-satisfy that requirement. No operator console or automatic continuation is required for this fix.
+The next required task is your personal `demo:handoff` acceptance run. The implementation and native
+event simulations are complete, but simulations do not prove a real person performed manual work.
+No operator console or general automatic continuation is required.
 
 Authenticated artifact approval is stretch work, not a submission prerequisite. Desktop execution,
 tenant binding implementation, learned failure branches, production raw-data redaction/retention,

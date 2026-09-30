@@ -596,3 +596,47 @@ automatic continuation, authenticated approval and a polished UI remain outside 
 automation completion. See `docs/submission-readiness.md`: 26 proven, four partial, one missing
 requirement. No more live discovery is needed. Preserve green baseline and existing accepted
 evidence; fix that single required lifecycle slice before submitting.
+
+## 2026-09-30 — Recorded human ownership and explicit completion
+
+The confirmed must-have was manual browser-action recording plus actual work after handback, not
+only ownership transitions. Added a fixed browser-event bridge in the adapter, reused HumanActionRecord
+with an intervention/epoch envelope, and added the separate `demo:handoff` terminal acceptance path.
+No model call, prompt/provider change, generated-artifact repair or generic replay redesign occurred.
+
+The recorder activates behind the current human epoch, captures native click/input/change and frame
+navigation, and stops before automation restoration. It omits typed values, labels, option text and
+DOM; only fixed categories survive. Private navigation origins follow existing diagnostic rules and
+are omitted publicly. Overflow fails acceptance. The guard remains installed during human ownership.
+
+Explicit `return` leads to a narrow controlled-bank completion: verify original member/location and
+closed warning, policy-check account navigation/extraction, check the account URL/currency, return the
+balance. The original intervention remains terminal; this separate operation does not introduce a
+general resume engine. `publish` is a second, explicit review step using the existing fail-closed
+boundary and one new strict handoff profile. No raw screenshot or typed input is published.
+
+ADR-010 compares traces, an operator UI, event instrumentation and generic continuation. Fixed
+categories intentionally sacrifice descriptive richness to avoid arbitrary-text leakage. Evidence is
+receipt-scoped, not lossless or authenticated: document bootstrap/unload/bridge boundaries and native
+UI are limitations. Tests distinguish automated native input from an actual person's work.
+
+Validation: 13 added tests cover ownership gating, native click/type/select, iframe interaction,
+navigation/reinstallation, stale epochs, explicit handback, overflow, same Page/BrowserContext,
+unresolved-warning rejection, real post-handback completion and safe publication. Forbidden navigation
+during human control receives zero destination hits. A test initially used selectOption, whose
+synthetic change events are correctly ignored; native popup keyboard behavior varied on this host.
+A visible native option click provides deterministic simulation without weakening the trusted-event
+gate. A DOM element typing error in that test was fixed; no production timing changes were needed.
+
+Final validation: typecheck and **195/195** passed; the handoff suite also passed repeated isolated
+runs. All six existing deterministic demos passed, and both supported accepted bundles validated
+unchanged. Tracked-file checks found no raw evidence/binaries, secrets or new local paths; matches
+were only existing synthetic rejection fixtures. Notion journal, requirement checklist, decision
+log, defense guide and handoff task were synchronized; the task remains in progress awaiting the
+author. Private preparation notes and public architecture/safety/
+handoff/readiness/evidence/README/REPORT documentation now distinguish implementation from acceptance.
+
+**Actual human acceptance remains pending.** The implementation agent did not run the headed manual
+runner or simulate a final pass and call it human. Exact next action: the author personally runs
+`npm run demo:handoff`, clicks Operator reviewed, explicitly returns control, reviews/publishes the
+safe result and reports the run ID. Only then may the requirement be marked proven.

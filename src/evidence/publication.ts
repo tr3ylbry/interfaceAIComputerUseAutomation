@@ -4,6 +4,7 @@ import { z } from "zod";
 import { CapabilityArtifactSchema, type ReplayEvent, type ReplayResult } from "../contracts/index.js";
 import type { DiscoveryRun } from "../discovery/contracts.js";
 import { validateReferences } from "../replay/validation.js";
+import { PublicHandoffSchema, handoffFields, type HandoffPublicationInput } from "./handoff.js";
 import { InventorySchema, PublicCapabilitySchema, PublicReplaySchema, PublicTraceSchema,
   PublicationManifestSchema, ReviewedManifestSchema, publicFilename } from "./schemas.js";
 
@@ -54,6 +55,7 @@ function checkContent(value: unknown, inventory: SensitiveInventory, depth = 0):
 }
 
 const schemas: Record<z.infer<typeof publicFilename>, z.ZodType> = {
+  "handoff.sanitized.json": PublicHandoffSchema,
   "capability.json": PublicCapabilitySchema,
   "tool-trace.sanitized.json": PublicTraceSchema,
   "replay.sanitized.json": PublicReplaySchema,
@@ -117,6 +119,10 @@ export function replayProjection(result: ReplayResult, modelCallsDuringReplay: n
     startedAt: result.startedAt, finishedAt: result.finishedAt, durationMs: result.durationMs, status: result.status,
     modelCallsDuringReplay, invocationAndOutputValuesOmitted: true, events: result.events.map(projectEvent),
   }, null, 2) };
+}
+
+export function handoffProjection(input: HandoffPublicationInput): EvidenceCandidate {
+  return handoffFields(input, projectEvent);
 }
 
 /** Keep this inventory private. Include raw/formatted and transformed values, not just inputs. */

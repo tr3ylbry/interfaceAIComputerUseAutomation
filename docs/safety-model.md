@@ -170,3 +170,24 @@ untrusted arbitrary web application or enabling other browser engines/speculativ
 `tests/navigation-policy-browser.test.ts` uses server-side counters, including redirect chains
 and cross-site frames: blocked destinations receive zero requests, while permitted documents and
 cross-origin scripts receive requests. Final browser location alone is not treated as evidence.
+
+## Recorded manual handoff (ADR-010)
+
+The recorder's Node-side gate requires current human ownership and epoch; it stops synchronously
+before automation reacquires control. Fixed browser instrumentation captures native clicks, typing,
+selection/change and document navigation. It never reads typed values, option text, labels or HTML.
+Fixed semantic categories trade detail for privacy. Origin-only navigation diagnostics stay private;
+even those origins are omitted from public evidence. Raw runner snapshots omit operator-controlled
+URL paths/queries too. The recorder does not disable navigation policy or imply action approval.
+
+The demo requires explicit `return`, validates the known member/warning context and checks the
+original policy before its completion click/read. A still-open warning, changed context, missing
+manual record, recorder overflow or navigation denial fails acceptance. No screenshot/trace is
+exported by this runner. Separate `publish` confirmation passes only the strict handoff projection
+through the existing publication gate; unknown fields, values, credentials, paths and binaries still
+fail closed. The original discovery bundles and generated artifact are unchanged.
+
+Native event trust is not human identity: automation tools can generate native events. This is not
+lossless input auditing or protection against hostile page scripts/OS users. Bootstrap, unload and
+bridge boundaries can lose events; popups/native browser UI and closed shadow roots are unsupported.
+The author must personally run acceptance and report it before the actual-human requirement is proven.

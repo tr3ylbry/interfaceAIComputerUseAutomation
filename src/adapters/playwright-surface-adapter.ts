@@ -32,6 +32,7 @@ import { NavigationPolicyError } from "../contracts/index.js";
 import { assertPrivateEvidenceDestination } from "../evidence/private-destination.js";
 import { NavigationFirewall } from "./navigation-firewall.js";
 import { DiscoveryObservation } from "./discovery-observation.js";
+import { HumanActionRecorder, type HumanRecording } from "./human-action-recorder.js";
 
 type ControlOwner = "automation" | "human" | "none";
 type ControlPhase =
@@ -62,6 +63,7 @@ type PlaywrightSessionState = {
   actionInFlight: boolean;
   navigation: NavigationFirewall | undefined;
   discovery: DiscoveryObservation;
+  humanRecorder?: HumanActionRecorder;
 };
 
 type LocatorRoot = {
@@ -454,6 +456,9 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     state.targetsByRef.clear();
     state.targetRefsById.clear();
     state.interventionId = interventionId;
+    state.humanRecorder ??= new HumanActionRecorder(state.page,
+      epoch => state.phase === "human_control" && state.owner === "human" && state.epoch === epoch);
+    await state.humanRecorder.start(interventionId, state.epoch + 1);
     this.transition(state, "human_control", "human");
     return {
       interventionId,
@@ -476,6 +481,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
         `Intervention '${interventionId}' does not own this session`,
       );
     }
+    state.humanRecorder?.stop();
     this.transition(state, "resuming_automation", "none");
     this.transition(state, "automation_running", "automation");
     delete state.interventionId;
@@ -484,6 +490,7 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
   async close(session: SurfaceSession): Promise<void> {
     const state = this.sessions.get(session.id);
     if (!state) return;
+    state.humanRecorder?.stop();
     if (state.traceActive) {
       await state.context.tracing.stop().catch(() => undefined);
       state.traceActive = false;
@@ -492,6 +499,12 @@ export class PlaywrightSurfaceAdapter implements SurfaceAdapter {
     await state.browser.close();
     this.sessions.delete(session.id);
     state.navigation?.assertAllowed();
+  }
+
+  getHumanRecording(session: SurfaceSession, interventionId: string): HumanRecording {
+    const recorder = this.getState(session).humanRecorder;
+    if (!recorder) throw new Error("Human recording unavailable");
+    return recorder.snapshot(interventionId);
   }
 
   getSessionSnapshot(session: SurfaceSession): {

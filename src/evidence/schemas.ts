@@ -11,9 +11,9 @@ const status = z.enum(["success", "failure", "intervention_required", "business_
 const tool = z.enum(["ui_fill", "ui_click", "ui_select", "ui_navigate", "ui_read", "finish_discovery", "request_human"]);
 const action = z.enum(["open", "navigate", "click", "fill", "select", "wait", "extract"]);
 const valueType = z.enum(["string", "integer", "number", "boolean", "date", "currency"]);
-export const publicFilename = z.enum(["capability.json", "tool-trace.sanitized.json", "replay.sanitized.json", "review-manifest.json", "publication-manifest.json"]);
+export const publicFilename = z.enum(["capability.json", "tool-trace.sanitized.json", "replay.sanitized.json", "handoff.sanitized.json", "review-manifest.json", "publication-manifest.json"]);
 export const sourceDigest = z.strictObject({
-  file: z.string().regex(/^(?:capability\.json|discovery-run\.raw\.json|manifest\.json|replay\.raw\.json|tool-trace\.sanitized\.json|observation-\d+\.png)$/),
+  file: z.string().regex(/^(?:capability\.json|handoff\.raw\.json|discovery-run\.raw\.json|manifest\.json|replay\.raw\.json|tool-trace\.sanitized\.json|observation-\d+\.png)$/),
   bytes: count, sha256: z.string().regex(/^[a-f0-9]{64}$/),
 });
 export const InventorySchema = z.strictObject({

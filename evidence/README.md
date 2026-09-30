@@ -94,6 +94,41 @@ accepted generated capability remain byte-identical.
 
 ## Explicit real-run command
 
+### Same-session human handoff (no model)
+
+`npm run demo:handoff` is a personal acceptance command, not another discovery attempt. Wait for
+automation to pause, click **Operator reviewed** yourself in the same browser, then type **return**
+and Enter in the terminal. Automation checks the manual resolution and completes the inquiry.
+The implementation agent only ran labelled simulations; genuine-human acceptance remains pending.
+
+Private `runtime/handoff/<run-id>/handoff.raw.json` contains the original intervention, ownership
+snapshots, value-free HumanActionRecords and post-handback events/output. It remains labelled
+unredacted because the controlled output is present. No human typed values, arbitrary UI text,
+URL paths/queries, screenshot or trace is written by this runner. Private navigation records retain
+only origin diagnostics; the public projection removes destinations altogether.
+
+On verified success, `handoff.sanitized.json` is validated and saved privately as a candidate. It
+includes run/intervention association, ownership epochs, fixed action categories, explicit handback,
+completion policy/locator/checkpoint events and success flags, without input/output values. Review
+the printed candidate and explicitly type **publish** to write it and `publication-manifest.json`
+under `discovery/<run-id>/` through the existing publisher. The manifest hashes public bytes and
+the withheld raw source. This shared directory name does not make the run a discovery execution.
+Nothing is committed automatically. The projection distinguishes `operator_reported_manual` from
+`automated_simulation`, and never claims authenticated/independently verified human identity.
+
+After your run, validate the public bundle without a model call:
+
+```bash
+npm run evidence:validate -- evidence/discovery/<your-run-id> <<'JSON'
+{"sensitiveValues":["12345",4321.09,"$4,321.09"],"secretValues":[]}
+JSON
+```
+
+Report your personal actions, run ID, completion result and publication result for final review.
+Aborted/failed runs retain private partial evidence and do not emit a public success bundle.
+
+### Paid discovery (not needed for handoff acceptance)
+
 With `OPENAI_API_KEY` set securely, run `npm run discover`. The command starts a fake-data proxy,
 uses OpenAI Responses once per bounded decision, compiles the successful run and replays its
 serialized artifact for a different fake member in a fresh session. No saved capability is loaded

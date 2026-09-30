@@ -63,12 +63,14 @@ profile and per-variant regression suite would be needed, not a claim that one a
 Intervention creates an InterventionRequest and retains the same live session plus context/events.
 Browser tests verify unchanged page identity, exclusive ownership, increasing epochs, rejected
 automation under human control, and stale-reference invalidation. Callers explicitly release the
-session. A headful browser permits manual interaction; the automated demo verifies transfer and
-reacquisition only. Human action recording and automatic continuation are unimplemented.
-The submission audit confirmed that recording actual manual interactions is required: the unused
-HumanActionRecord contract and ownership events are insufficient. Manual work followed by explicit
-handback and resumed/completed automation has not been demonstrated. This is an **open submission
-blocker**, not an optional console feature. Automatic continuation remains outside scope.
+session. The separate `demo:handoff` opens a headed browser, records native manual interaction
+categories without values/UI text, and waits for terminal `return`. Its scoped completion checks the
+closed warning/member context, then policy-checks account navigation and typed savings extraction on
+the same page. This is not a generic resume engine or approval bypass; the original intervention
+result remains unchanged (ADR-010). Browser simulations prove the mechanism, including recording,
+epochs, rejection of unresolved state and completion. **The author's genuine-human acceptance pass
+is still pending**, so that requirement remains partially proven. A separate `publish` confirmation
+uses the fail-closed boundary for safe handoff evidence. No console or automatic continuation is needed.
 
 # Safety
 

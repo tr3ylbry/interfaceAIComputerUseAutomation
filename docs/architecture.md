@@ -168,10 +168,13 @@ Normal terminal results close their sessions. A failed handoff also closes the s
 continuation is deliberately absent. Adapter handoff rejects in-flight actions and invalidates
 old target references; target resolution detects ownership changes across awaits.
 
-The submission audit identifies an acceptance gap: no actual manual-action recorder consumes
-`HumanActionRecord`, and tests do not demonstrate manual work followed by automation completion.
-Control-transfer events and returned ownership are not substitutes. See `human-handoff.md`;
-minimal explicit handback/completion is required, while automatic continuation is not.
+ADR-010 closes the implementation gap identified by the submission audit: a browser event recorder
+uses HumanActionRecord under a matching human ownership epoch. A separate `demo:handoff` runner
+waits for explicit terminal return, verifies the resolved warning/context, and completes the bank
+inquiry through policy-checked SurfaceAdapter actions on the same page. Generic replay still returns
+one intervention result; no automatic mid-artifact resume engine or approval bypass was added.
+The recorder and completion are proven by simulated browser events, not a genuine-human acceptance
+run. That personal pass remains required; see `human-handoff.md`.
 
 ## Core invariants
 
@@ -210,3 +213,9 @@ timestamps and withheld-source metadata. Historical evidence is validated withou
 The discovery/adapter raw writers gain only a public-destination persistence guard; execution,
 provider configuration and normal ignored evidence output remain unchanged. ADR-009 records this
 material trust boundary separately from runtime navigation/action policy.
+
+Handoff adds a pinned `handoff.sanitized.json` profile: intervention/run association, ownership
+phases/epochs, fixed action categories, explicit handback, completion checkpoints and value-free
+result. The same content/integrity checks apply. The runner stores raw context privately and asks
+for a separate publication confirmation; screenshots are never copied. Public records distinguish
+automated simulation from operator-reported manual work and do not assert authenticated identity.

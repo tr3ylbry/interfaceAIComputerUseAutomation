@@ -8,6 +8,7 @@
     "build": "tsc",
     "proxy": "npm run build && node dist/src/demo/legacy-bank-server.js",
     "demo": "npm run build && node dist/src/vertical-slice/run-demo.js",
+    "demo:handoff": "npm run build && node dist/src/vertical-slice/run-handoff.js",
     "discover": "npm run build && node dist/src/vertical-slice/run-discovery.js",
     "typecheck": "tsc --noEmit",
     "evidence:validate": "npm run build && node dist/src/evidence/validate-cli.js",
