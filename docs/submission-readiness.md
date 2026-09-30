@@ -1,17 +1,18 @@
-# Submission-readiness audit — 2026-09-28, implementation update 2026-09-30
+# Submission-readiness audit — finalized 2026-09-30
 
-**Verdict: NOT READY.** The genuine discovery → typed artifact → different-input model-free replay
-requirement is proven. The remaining acceptance blocker is the author's personal recorded
-same-session handoff pass. Recording and explicit post-handback completion are now implemented and
-tested with native browser-event simulations; **a genuine human has not yet performed acceptance**.
-Run `npm run demo:handoff`, personally click Operator reviewed, type `return`, verify completion,
-and review/publish the safe candidate. See [handoff instructions](human-handoff.md) and ADR-010.
+**Verdict: READY TO SUBMIT.** Genuine discovery → typed artifact → different-input model-free replay
+and genuine recorded same-session handoff are proven within the controlled take-home scope.
+The author personally completed run `67e7318d-2874-4a8f-8917-89c4bd19a2fe`: one manual click,
+explicit terminal handback, restored ownership and successful verification/navigation/extraction.
+The [public handoff evidence](../evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json)
+passes the unchanged publication validator. No submission blocker remains. This is not authenticated
+human identity, a general continuation engine or a production co-browsing claim.
 
 Historical audited baseline: `a35c1e4fce33beae0b51c1491f3274bc6cc6439d`. The original audit changed documentation/setup
 guidance and published one existing-runtime exceptional replay projection. No source, tests,
 dependencies, prompts, provider configuration or accepted generated-artifact bytes changed in that audit.
 No OpenAI call or discovery command was run. The matrix below incorporates the subsequent recorder
-implementation; the remaining audit findings/validation history retain their original date.
+implementation and genuine acceptance; historical audit findings/validation retain their original date.
 
 ## Requirement matrix
 
@@ -40,39 +41,43 @@ robustness. PARTIALLY PROVEN distinguishes implemented seams from untested broad
 | 16 | Structured failure context | PROVEN | [ReplayResult](../src/contracts/replay.ts) and browser assertions for step/expected/observed/evidence; uncertain effects are not retried. |
 | 17 | Origin/route/action allowlists | PROVEN | [Generic policy](../src/replay/policy.ts), [navigation firewall](../src/adapters/navigation-firewall.ts), [zero-forbidden-server-hit tests](../tests/navigation-policy-browser.test.ts). Document navigation, not all network traffic. |
 | 18 | Risky/irreversible actions | PROVEN | [Discovery risk classification](../src/discovery/policy.ts), [replay policy tests](../tests/replay.test.ts): blocked/unapproved actions do not execute. Inquiry permissions trust configured app semantics. |
-| 19 | Sensitive-data handling | PARTIALLY PROVEN | [Publication boundary/tests](../tests/evidence-publication.test.ts) protect public structured bundles. Raw screenshots/results deliberately contain fake sensitive values and stay ignored/private; no production redaction/retention or provider zero-retention claim. |
+| 19 | Sensitive-data handling, including broader production privacy | PARTIALLY PROVEN | Required public evidence/secret handling is proven by [publication tests](../tests/evidence-publication.test.ts), validated bundles and hygiene scans. Only non-required production PII detection/retention/model privacy remains partial; fake raw screenshots/results stay private. Not a production-data approval. |
 | 20 | Structured logs / richer failure evidence | PROVEN | Replay events and opt-in [adapter capture](../src/adapters/playwright-surface-adapter.ts); failure tests assert screenshot/DOM references labelled unredacted. Raw binaries are intentionally not public. |
-| 21 | Same-session human takeover | PARTIALLY PROVEN | [Adapter ownership tests](../tests/playwright-surface-adapter.test.ts) prove page identity, epoch and exclusivity. Actual manual-work acceptance is missing (row 31). |
-| 22 | Human handback / resume or complete | PARTIALLY PROVEN | [Explicit runner](../src/vertical-slice/run-handoff.ts) and [completion](../src/vertical-slice/handoff-completion.ts) verify the warning then navigate/read on the same session; [simulated tests](../tests/human-handoff.test.ts) pass. Personal acceptance pending; no general automatic continuation. |
-| 23 | Heterogeneous-surface abstraction | PARTIALLY PROVEN | [SurfaceAdapter](../src/contracts/surface.ts), real awkward web/iframe surface and fake-adapter tests. Desktop/visual-only execution remains unimplemented; its required discussion is in REPORT. |
+| 21 | Same-session human takeover | PROVEN | [Genuine handoff](../evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json) records samePage/sameSession, human epoch 2 and one click personally confirmed by the author; ownership/stale-action tests remain green. No cryptographic identity claim. |
+| 22 | Human handback / resume or complete | PROVEN | Same genuine bundle: explicitHandback, epochs 3→4, warning verification, account navigation, savings extraction and successful output verification, zero model calls. [Scoped completion](../src/vertical-slice/handoff-completion.ts) is not general automatic continuation. |
+| 23 | Heterogeneous-surface abstraction and broader execution | PARTIALLY PROVEN | Required [SurfaceAdapter](../src/contracts/surface.ts) seam and REPORT desktop/heterogeneity explanation are proven; real awkward web/iframe execution works. Only the non-required desktop/visual-only implementation and broad portability remain unproven. |
 | 24 | Multi-tenant/vendor variation discussion | PROVEN | [REPORT](../REPORT.md#heterogeneity--multi-tenant), [ADR-002](decisions/0002-surface-abstraction.md), [ADR-005](decisions/0005-targeting-and-core-contracts.md): versioned vendor flow + reviewed tenant bindings; no portability claim. |
 | 25 | Genuine discovery evidence | PROVEN | Accepted four-file bundle; five model decisions, live read/finish verification; unchanged generated draft. First 429 attempt separately preserved. |
 | 26 | Exceptional replay evidence | PROVEN | Audit closes missing-public-log gap with [replay-only bundle](../evidence/discovery/d7727060-ec70-4f74-b4a8-501825698825/publication-manifest.json), produced through existing publisher. |
 | 27 | Public GitHub repository | PROVEN | GitHub unauthenticated repository API reported `private: false`, default branch main; fetched main matched origin/main before audit edits. |
 | 28 | README / exact setup | PROVEN | Fresh checkout install, browser install, typecheck/tests; standalone proxy HTTP 200 and all six documented demos. Paid command inspected, not rerun. |
-| 29 | REPORT exact seven headings | PROVEN | [REPORT](../REPORT.md) uses the seven literal required names, about 1,200 words. It now explicitly identifies the handoff blocker. |
+| 29 | REPORT exact seven headings | PROVEN | [REPORT](../REPORT.md) retains all seven literal required names and a concise write-up; handoff claims now cite genuine acceptance and its limits. |
 | 30 | Evidence directory | PROVEN | [Evidence index](../evidence/README.md) distinguishes historical/generated/raw/private/public/replay-only data and provides read-only validation commands. |
-| 31 | Record actual manual human actions | PARTIALLY PROVEN | [Recorder](../src/adapters/human-action-recorder.ts) observes native click/type/change/frame navigation only under human ownership/epoch, with no values. Safe projection and simulated completion are tested. A person must still perform and report the acceptance run. |
+| 31 | Record actual manual human actions | PROVEN | Genuine bundle records one redacted click/button associated with run/intervention and epoch 2, backed by the author's personal report. Manual click is genuinely demonstrated; type/select/navigation mechanisms remain separately simulation-tested. Public evidence is value-free and hash-validated. |
 
-Summary after implementation: **26 PROVEN, 5 PARTIALLY PROVEN, 0 wholly unimplemented**. A high count does not override the
-required handoff gap. The fake-data/publication scope in row 19 is intentional; do not use this
-prototype with real customer data without a separate privacy design.
+Final counts: **29 PROVEN, 2 PARTIALLY PROVEN, 0 NOT PROVEN** across the same 31 rows.
+No required acceptance path remains partial: rows 19 and 23 retain conservative partial ratings
+only for their broader, explicitly non-required production-privacy and desktop-execution scope.
+Required safe public evidence, abstraction/explanation and tenant discussion are satisfied. Do not
+use this fake-data prototype with real customer data without a separate privacy design.
 
 ## Findings and disposition
 
 ### A — Submission blockers
 
-**A1: Incomplete recorded human handoff — implementation complete, personal acceptance pending.** The original finding was: capture actual human interactions safely while the human
+**A1: Recorded human handoff — CLOSED by genuine acceptance on 2026-09-30.** The original finding was: capture actual human interactions safely while the human
 owns the same session, associate records/evidence with the intervention/run, then demonstrate
-explicit return and automation resuming or completing on that page. The adapter can return
-ownership, but the existing demo/tests do not perform manual work or a successful action afterward.
-The coordinator has `getHandoff`/`releaseHandoff`, not a continuation API. Do not equate ownership
+explicit return and automation resuming or completing on that page. At audit time, the adapter could
+return ownership, but the demo/tests did not perform manual work or a successful action afterward.
+The coordinator had `getHandoff`/`releaseHandoff`, not a continuation API. Do not equate ownership
 transition with task completion, or a schema declaration with a working recorder.
 
 The audit itself introduced no recorder. The subsequent ADR-010 slice implements that separate
 path: 13 new simulated tests, 195 total passing; original discovery/replay/provider behavior remains
-unchanged apart from recording during handoff. Real personal acceptance is still required. An
-operator console, authenticated approval, automatic continuation and another LLM run remain unnecessary.
+unchanged apart from recording during handoff. The author subsequently personally performed and
+reported the accepted run above. Its two-file publication and four matched completion checkpoints
+close A1. An operator console, authenticated approval, automatic continuation and another LLM run
+remain unnecessary. The earlier NOT READY verdict was correct then and is preserved in the journal.
 
 **A2: Missing committed exceptional replay log — fixed.** Existing tests were not the requested
 saved exceptional evidence. The new replay-only business-outcome bundle closes this packaging gap
@@ -92,16 +97,16 @@ without changing the runtime or inventing a learned branch.
 1. Desktop, visual-only targeting and tenant-binding execution; only the seam/discussion is required here.
 2. General workflow branching/interpolation; discovered artifact is the demonstrated happy path.
 3. Production PII redaction/retention and general outbound DLP; this demo uses fake data only.
-4. Full operator UI and **automatic** continuation; minimal explicit human handback/completion is still required.
+4. Full operator UI, authenticated operator identity and **automatic general** continuation; required explicit handback/completion is proven.
 5. Broad reliability claims: one model-chosen path and one different fake member, not drift/tenant robustness.
 
 ### D — Stretch deliberately deferred
 
 Authenticated artifact approval, signed provenance, branch discovery, additional adapters, tenant
 override engine and richer safe provider diagnostics. No dependency major upgrade or new paid run
-is needed to close A1. Frameworks, queues, databases and service infrastructure are not required.
+is needed for submission. Frameworks, queues, databases and service infrastructure are not required.
 
-## Validation and repository hygiene
+## Historical validation and repository hygiene — original audit
 
 - Fresh temporary clone of audited baseline: `npm ci`, `npx playwright install chromium`,
   `npm run typecheck`, `npm test` all passed; **182/182**. Browser binaries use the installed local
@@ -137,13 +142,30 @@ Replay has no bank/model imports. Bounded polling/backoff is explicit, with inje
 unit tests; no arbitrary browser sleeps were found. Catch sites normalize expected failures or
 preserve safety/ownership on cleanup; provider diagnostic detail loss is an already documented cut.
 At audit time, the unused HumanActionRecord was the material requirement gap, not a reason for a
-style refactor. ADR-010 now implements its recorder/consumer; personal acceptance remains pending.
+style refactor. ADR-010 now implements its recorder/consumer, and the genuine pass closes acceptance.
+
+## Final validation — 2026-09-30
+
+- Typecheck and **195/195 tests** pass, including navigation confinement, publication, recorded handoff,
+  all replay result categories, bounded recovery/exhaustion and scripted discovery. No live API call.
+- Canonical deterministic demo returns success/4321.09. No new discovery or manual acceptance rerun.
+- Genuine discovery, exceptional replay and new genuine handoff bundles all validate unchanged.
+  New handoff public bytes (3,327) match SHA-256 `6bf92f05e6755f78bd9c967efdb1c769a5083bb22f216a723f37bcf6d226f663`.
+  The withheld raw source's bytes/hash also match; its contents are not published.
+- New handoff: run/intervention IDs match the envelope; one redacted action; same page/session;
+  complete bounded recording; explicit handback; human/returned epochs 2/4; success; zero model
+  calls; output verified and values omitted. All four checkpoints matched. The personal attribution
+  and exact Operator reviewed label are author-reported; public evidence only says click/button.
+- Production audit: zero. Development: unchanged two moderate Vitest/mocker findings for the same
+  advisory. Suggested major fix is now 5.0.3; no forced remediation or dependency changes.
+- Only the two new public handoff files are added as evidence; no raw runtime data, screenshots,
+  secrets, local paths, environment files, dependencies or build output are added. Existing first
+  failed discovery and accepted generated artifact remain untouched.
 
 ## Exact next action
 
-**Personally run `npm run demo:handoff` and report the run ID/result.** Implementation validation is
-complete; preserve safe acceptance evidence through the explicit publication prompt. Do not submit
-or mark genuine-human acceptance proven until this pass is reported and reviewed.
+**One final personal walkthrough of README, REPORT and evidence, then submission.** No further
+implementation or paid discovery is needed.
 
 ## Assignment sources
 

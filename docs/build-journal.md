@@ -640,3 +640,37 @@ handoff/readiness/evidence/README/REPORT documentation now distinguish implement
 runner or simulate a final pass and call it human. Exact next action: the author personally runs
 `npm run demo:handoff`, clicks Operator reviewed, explicitly returns control, reviews/publishes the
 safe result and reports the run ID. Only then may the requirement be marked proven.
+
+## 2026-09-30 — Genuine manual handoff accepted; submission ready
+
+The author personally completed and reported run `67e7318d-2874-4a8f-8917-89c4bd19a2fe`, intervention
+`71d5d47d-1314-4d1b-b77f-c79da00aeade`. Automation paused through epochs 0→1→2; the author clicked
+Operator reviewed in the same live browser. The recorder captured one redacted click at
+22:15:57.522Z. Explicit terminal `return` at 22:16:10.438Z led through epochs 3→4. Automation verified
+the closed warning, navigated to Account Information, extracted Savings and verified its typed
+output, completing at 22:16:10.608Z. The author reports 4321.09; the public projection omits values.
+Same page/session was preserved, all four checkpoints matched, and no model calls occurred.
+
+The public publisher produced exactly `handoff.sanitized.json` and `publication-manifest.json` under
+`evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/`. Both pass the unchanged validator; public
+byte counts/hashes and the withheld raw-source digest match. No typed values, credentials, local
+paths, DOM, screenshots or binary data are published. Raw evidence remains private/ignored.
+The label and physical-human attribution are supported by the author's direct report; the safe
+record says click/button and correctly retains independently-verified-human=false.
+
+The earlier NOT READY audit and implementation-only pending status remain historical entries above.
+This pass closes their real blocker rather than rewriting those earlier findings. ADR-010 is
+confirmed, not redesigned. README, REPORT, handoff, architecture, safety, readiness and evidence
+guidance now reflect the genuine proof. Private defense notes/Notion history are aligned.
+
+Final review: **READY TO SUBMIT**, 29 proven / 2 partially proven / 0 not proven across 31 matrix rows.
+Only broader non-required production privacy and desktop execution retain partial status; required
+safe publication and surface/tenant explanations are satisfied. Typecheck and **195/195 tests** pass;
+all three supported evidence bundles validate and canonical model-free replay succeeds. Production
+audit is zero; two moderate dev-only Vitest findings remain, with the suggested major fix now 5.0.3.
+No source, prompt, provider, replay semantics, architecture, dependency or generated-artifact changes;
+no new OpenAI call or fabricated/manual rerun. Only the reported two-file bundle is new evidence.
+
+Limits remain explicit: no authenticated identity/approval, general automatic continuation,
+lossless human auditing, popup/native UI recorder, desktop/tenant runtime, full PII detection or
+polished console. The next action is one personal README/REPORT/evidence walkthrough, then submission.

@@ -1,6 +1,6 @@
 # ADR-010: Recorded human ownership and explicit scoped completion
 
-**Status:** Implemented and automatically tested; genuine-human acceptance pending.
+**Status:** Accepted, implemented and automatically tested; genuine-human acceptance confirmed on 2026-09-30.
 
 ## Context
 
@@ -54,8 +54,13 @@ candidate and types `publish`. Raw result/context stay private; no screenshot/tr
 `tests/human-handoff.test.ts` uses explicitly labelled browser simulations for interaction categories,
 frames/navigation, stale events, exclusivity, overflow, same Page/BrowserContext, blocked navigation
 with zero forbidden hits, unresolved-state rejection, completion and public validation.
-`npm run demo:handoff` is reserved for the author's personal acceptance run. No such run was performed
-by the implementation agent; submission acceptance remains partial until the author reports it.
+The implementation agent did not perform or fabricate a manual pass. The author subsequently
+personally ran `npm run demo:handoff`: run `67e7318d-2874-4a8f-8917-89c4bd19a2fe`, one redacted click
+in human epoch 2, explicit terminal return through epochs 3→4, same page/session, then successful
+warning verification/account navigation/savings extraction with zero model calls. The two-file public
+bundle validates and its hashes match. The author reports output 4321.09; the projection deliberately
+omits output values and the clicked label. This confirms ADR-010 without changing its decision or
+claiming authenticated identity. Earlier simulation-only acceptance status remains in the build journal.
 
 Fixed roles sacrifice detailed semantic descriptions to prevent UI text/value leakage. Records are
 receipt-scoped, not lossless OS input auditing: unloaded documents/bridge failures can lose events;

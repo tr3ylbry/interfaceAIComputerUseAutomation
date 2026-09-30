@@ -25,3 +25,9 @@ Re-ran both commands against the registry: unchanged two moderate development en
 `GHSA-82fw-gwwq-j7x9`; production findings remain zero. A clean lockfile install also completed.
 No dependency or lockfile change was made. Preserve the disposition above and keep the test runner
 local; an intentional major-version migration is separate work, not a submission prerequisite.
+
+## 2026-09-30 final submission validation
+
+Production findings remain zero; the same two moderate development entries remain. The registry
+now offers Vitest 5.0.3 instead of 5.0.2 as the SemVer-major automatic fix. Exposure/disposition
+is unchanged: no redirect-mock usage, dependency edits or forced remediation.

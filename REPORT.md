@@ -68,9 +68,13 @@ categories without values/UI text, and waits for terminal `return`. Its scoped c
 closed warning/member context, then policy-checks account navigation and typed savings extraction on
 the same page. This is not a generic resume engine or approval bypass; the original intervention
 result remains unchanged (ADR-010). Browser simulations prove the mechanism, including recording,
-epochs, rejection of unresolved state and completion. **The author's genuine-human acceptance pass
-is still pending**, so that requirement remains partially proven. A separate `publish` confirmation
-uses the fail-closed boundary for safe handoff evidence. No console or automatic continuation is needed.
+epochs, rejection of unresolved state and completion. Genuine run
+`67e7318d-2874-4a8f-8917-89c4bd19a2fe` then recorded the author's personally confirmed click on
+Operator reviewed in epoch 2, explicit terminal handback through epochs 3→4, and successful
+verification/navigation/extraction on the same page/session, returning 4321.09 with zero model calls.
+Its [value-free evidence](evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json)
+and hash manifest pass the publication boundary. This closes the handoff requirement for one
+controlled scenario, not authenticated identity, lossless auditing or general automatic continuation.
 
 # Safety
 

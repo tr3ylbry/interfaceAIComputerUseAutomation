@@ -1,0 +1,25 @@
+{
+  "kind": "evidence_publication",
+  "version": 1,
+  "runId": "67e7318d-2874-4a8f-8917-89c4bd19a2fe",
+  "generatedAt": "2026-09-30T22:17:21.045Z",
+  "reviewedAt": "2026-09-30T22:17:21.043Z",
+  "reviewStatus": "reviewed",
+  "publicationStatus": "validated",
+  "binaryPolicy": "withheld_manual_review_required",
+  "publicFiles": [
+    {
+      "file": "handoff.sanitized.json",
+      "bytes": 3327,
+      "sha256": "6bf92f05e6755f78bd9c967efdb1c769a5083bb22f216a723f37bcf6d226f663"
+    }
+  ],
+  "sources": [
+    {
+      "file": "handoff.raw.json",
+      "bytes": 8739,
+      "sha256": "b0d868de529247113486cdc527307078e36e31274992fb749f74f2f8bcfb4bec",
+      "withheld": true
+    }
+  ]
+}

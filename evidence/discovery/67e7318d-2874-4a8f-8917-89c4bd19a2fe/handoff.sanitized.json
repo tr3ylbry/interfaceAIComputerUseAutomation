@@ -1,0 +1,134 @@
+{
+  "kind": "value_free_handoff_completion",
+  "redacted": true,
+  "runId": "67e7318d-2874-4a8f-8917-89c4bd19a2fe",
+  "interventionId": "71d5d47d-1314-4d1b-b77f-c79da00aeade",
+  "acceptance": "operator_reported_manual",
+  "humanAcceptanceIndependentlyVerified": false,
+  "requestedAt": "2026-09-30T22:15:38.015Z",
+  "handbackAt": "2026-09-30T22:16:10.438Z",
+  "finishedAt": "2026-09-30T22:16:10.608Z",
+  "sameSession": true,
+  "samePage": true,
+  "recordingComplete": true,
+  "control": [
+    {
+      "phase": "automation_running",
+      "owner": "automation",
+      "epoch": 0
+    },
+    {
+      "phase": "paused_for_intervention",
+      "owner": "none",
+      "epoch": 1
+    },
+    {
+      "phase": "human_control",
+      "owner": "human",
+      "epoch": 2
+    },
+    {
+      "phase": "resuming_automation",
+      "owner": "none",
+      "epoch": 3
+    },
+    {
+      "phase": "automation_running",
+      "owner": "automation",
+      "epoch": 4
+    }
+  ],
+  "actions": [
+    {
+      "at": "2026-09-30T22:15:57.522Z",
+      "kind": "click",
+      "targetSummary": "button",
+      "redacted": true
+    }
+  ],
+  "humanEpoch": 2,
+  "returnedEpoch": 4,
+  "explicitHandback": true,
+  "status": "success",
+  "modelCalls": 0,
+  "completionEvents": [
+    {
+      "type": "policy_decision",
+      "at": "2026-09-30T22:16:10.452Z",
+      "stepId": "verify-manual-resolution",
+      "action": "extract",
+      "decision": "allow"
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-30T22:16:10.454Z",
+      "stepId": "handoff-completion",
+      "targetId": "closed-operator-warning",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-30T22:16:10.458Z",
+      "stepId": "verify-manual-resolution",
+      "matched": true
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-30T22:16:10.460Z",
+      "stepId": "handoff-completion",
+      "targetId": "account-information-link",
+      "strategyIndex": 0
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-30T22:16:10.465Z",
+      "stepId": "complete-account-navigation",
+      "action": "click",
+      "decision": "allow"
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-30T22:16:10.508Z",
+      "stepId": "complete-account-navigation"
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-30T22:16:10.508Z",
+      "stepId": "complete-account-navigation",
+      "matched": true
+    },
+    {
+      "type": "target_resolved",
+      "at": "2026-09-30T22:16:10.572Z",
+      "stepId": "handoff-completion",
+      "targetId": "savings-balance-value",
+      "strategyIndex": 0
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-30T22:16:10.582Z",
+      "stepId": "complete-savings-extraction",
+      "matched": true
+    },
+    {
+      "type": "policy_decision",
+      "at": "2026-09-30T22:16:10.605Z",
+      "stepId": "complete-savings-extraction",
+      "action": "extract",
+      "decision": "allow"
+    },
+    {
+      "type": "step_completed",
+      "at": "2026-09-30T22:16:10.608Z",
+      "stepId": "complete-savings-extraction"
+    },
+    {
+      "type": "checkpoint_evaluated",
+      "at": "2026-09-30T22:16:10.608Z",
+      "stepId": "completion-output",
+      "matched": true
+    }
+  ],
+  "outputVerified": true,
+  "outputValuesOmitted": true
+}

@@ -18,8 +18,13 @@ The intervention request carries the current goal/capability, step, reason, stat
 
 The 2026-09-28 audit identified missing manual recording/completion as a submission blocker.
 The recorder and explicit scoped completion are now implemented (ADR-010) and tested with simulated
-browser input. **Genuine-human acceptance remains pending:** automated tests are not a person's
-manual pass. Ownership history alone remains insufficient.
+browser input. The author's genuine manual run `67e7318d-2874-4a8f-8917-89c4bd19a2fe` subsequently
+closed the blocker: one personally confirmed Operator reviewed click was recorded in epoch 2,
+followed by explicit `return`, epochs 3→4, and verified automation completion on the same page/session.
+The result was 4321.09 with zero model calls. All four completion checkpoints matched; all three
+target resolutions used strategy index 0. The [public projection](../evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json)
+and manifest validate unchanged. The public target summary is only `button`; the precise label and
+physical-human attribution come from the author's report, not cryptographic identity verification.
 
 ## Implemented replay lifecycle
 
@@ -77,7 +82,7 @@ Epochs advance 2 → 3 → 4; old browser messages are ignored. Automation refs 
 same page/context/session survives. Recording is capped at 1,000 events; overflow fails acceptance.
 Late messages after the cutoff are ignored rather than attributed to automation or a later operator.
 
-## Personal acceptance instructions
+## Personal acceptance reproduction instructions
 
 1. From an interactive terminal on a graphical desktop, run `npm run demo:handoff`. No API key is needed.
 2. Wait for the terminal to say automation is paused. In the existing Chromium window, personally
@@ -88,8 +93,8 @@ Late messages after the cutoff are ignored rather than attributed to automation 
    It performs real post-handback work; it does not close immediately or repeat the original search.
 5. Review the displayed value-free candidate. Type **publish** and Enter to publish through the
    existing gate, or just Enter to keep it private. Publication does not commit anything.
-6. Report the run ID and your personal result. Only then can genuine-human acceptance be reviewed
-   and marked proven. Neither the script nor this implementation claims independent human verification.
+6. Report the run ID and personal result when reproducing. The accepted run above has already been
+   reported and reviewed. Neither the script nor this implementation claims independent human identity verification.
 
 The private `evidence/runtime/handoff/<run-id>/handoff.raw.json` retains the intervention result,
 ownership snapshots, records and completion events/output, labelled unredacted. A successful run

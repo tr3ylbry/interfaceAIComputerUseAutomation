@@ -99,7 +99,24 @@ accepted generated capability remain byte-identical.
 `npm run demo:handoff` is a personal acceptance command, not another discovery attempt. Wait for
 automation to pause, click **Operator reviewed** yourself in the same browser, then type **return**
 and Enter in the terminal. Automation checks the manual resolution and completes the inquiry.
-The implementation agent only ran labelled simulations; genuine-human acceptance remains pending.
+The implementation agent only ran labelled simulations. The author subsequently completed and
+personally reported genuine run `67e7318d-2874-4a8f-8917-89c4bd19a2fe`; acceptance is now closed.
+
+Accepted public files (exact publisher output, not manually repaired):
+
+- [handoff.sanitized.json](discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json):
+  one redacted `click`/`button` during human epoch 2, explicit handback through epochs 3→4,
+  same page/session, four matched completion checkpoints and zero model calls. The author confirms
+  clicking Operator reviewed and typing `return`; the public projection omits labels/terminal text
+  and output values. The reported completion balance was 4321.09.
+- [publication-manifest.json](discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/publication-manifest.json):
+  public byte count/SHA-256 and withheld raw-source digest. Both digests match; no raw source is copied.
+
+Run/intervention association is `67e7318d-2874-4a8f-8917-89c4bd19a2fe` /
+`71d5d47d-1314-4d1b-b77f-c79da00aeade`. Publication validation passes with no sensitive values,
+credentials, local paths, DOM or binaries. `operator_reported_manual` and
+`humanAcceptanceIndependentlyVerified: false` remain accurate: the personal report is not
+cryptographic authentication or an independently verified operator identity.
 
 Private `runtime/handoff/<run-id>/handoff.raw.json` contains the original intervention, ownership
 snapshots, value-free HumanActionRecords and post-handback events/output. It remains labelled
@@ -224,12 +241,12 @@ Application guards cannot prevent a local operator bypassing the writer or force
 
 ## Validate the committed fixture bundles
 
-From the repository root after installation, this read-only command validates the genuine success
-and exceptional replay bundles. Its inventory contains **only the documented fake fixture values**;
+From the repository root after installation, this read-only command validates the genuine discovery,
+exceptional replay and genuine handoff bundles. Its inventory contains **only the documented fake fixture values**;
 it needs no key, browser, ignored local inventory file or live API:
 
 ```bash
-for run in aafa19ac-42a4-4550-b25b-7d57b4589c66 d7727060-ec70-4f74-b4a8-501825698825; do
+for run in aafa19ac-42a4-4550-b25b-7d57b4589c66 d7727060-ec70-4f74-b4a8-501825698825 67e7318d-2874-4a8f-8917-89c4bd19a2fe; do
   npm run evidence:validate -- "evidence/discovery/$run" <<'JSON'
 {"sensitiveValues":["12345","67890",4321.09,8765.43,"$4,321.09","$8,765.43"],"secretValues":[]}
 JSON

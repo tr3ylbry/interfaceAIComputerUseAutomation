@@ -190,4 +190,8 @@ fail closed. The original discovery bundles and generated artifact are unchanged
 Native event trust is not human identity: automation tools can generate native events. This is not
 lossless input auditing or protection against hostile page scripts/OS users. Bootstrap, unload and
 bridge boundaries can lose events; popups/native browser UI and closed shadow roots are unsupported.
-The author must personally run acceptance and report it before the actual-human requirement is proven.
+The author personally completed and reported run `67e7318d-2874-4a8f-8917-89c4bd19a2fe`; its one
+redacted click, explicit handback, same-session completion and zero-model result pass the unchanged
+publication rules. The actual-human requirement is proven for that controlled pass, based on the
+author's report plus structured evidence, not authenticated operator identity. No new privacy or
+lossless-audit guarantee follows from this single success.

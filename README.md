@@ -17,10 +17,12 @@ zero replay model calls. See the [reviewed evidence](evidence/discovery/aafa19ac
 The first attempt's HTTP 429 remains preserved under
 `evidence/discovery/92eb2d6e-cdba-47e9-9051-bb442492f466/`. Offline tests pass 195/195.
 
-Submission audit: the discovery/replay through-line is proven, but **handoff acceptance is incomplete**.
-The recorder and explicit handback/completion path are implemented and tested with simulated browser
-events. Your personal headed-browser acceptance run is still required. See the
-[requirement matrix](docs/submission-readiness.md) and command below.
+**Ready to submit within the controlled take-home scope.** Genuine manual handoff run
+`67e7318d-2874-4a8f-8917-89c4bd19a2fe` records one human-owned click, explicit terminal handback,
+the same page/session and successful post-handback verification/navigation/extraction with zero
+model calls. The author personally confirmed the interaction; this is not authenticated identity.
+See the [requirement matrix](docs/submission-readiness.md) and
+[value-free handoff evidence](evidence/discovery/67e7318d-2874-4a8f-8917-89c4bd19a2fe/handoff.sanitized.json).
 
 Implemented contract layer:
 
@@ -146,8 +148,9 @@ Enter to keep it private. Ctrl-C/any other handback response aborts; there is no
 
 Raw evidence and the validated candidate stay under `evidence/runtime/handoff/<run-id>/`; explicit
 publication creates `evidence/discovery/<run-id>/handoff.sanitized.json` and a publication manifest,
-without committing them. No screenshots, typed values or arbitrary UI text are published. Report
-your run ID/result before marking genuine-human acceptance proven. See [handoff details and limits](docs/human-handoff.md).
+without committing them. No screenshots, typed values or arbitrary UI text are published. The
+personal acceptance above is already complete; this command is available for reproduction, not
+another required run. See [handoff details and limits](docs/human-handoff.md).
 
 For programmatic use, import `ReplayCoordinator` from `src/replay/index.ts`, construct it with a
 `SurfaceAdapter`, and call `run(savedArtifact, { member_id: "12345" })`. On intervention, retrieve
@@ -219,11 +222,10 @@ This validates one controlled happy path and a second fake input, not general UI
 tenant portability. Both image and semantic observations were sent; this trace cannot isolate
 the contribution of visual reasoning. Raw screenshots/logs remain ignored and unredacted.
 
-## Remaining acceptance work and deliberate cuts
+## Submission status and deliberate cuts
 
-The next required task is your personal `demo:handoff` acceptance run. The implementation and native
-event simulations are complete, but simulations do not prove a real person performed manual work.
-No operator console or general automatic continuation is required.
+The genuine handoff acceptance closes the final blocker. Review README, REPORT and the preserved
+evidence once personally, then submit. No additional implementation or paid discovery is required.
 
 Authenticated artifact approval is stretch work, not a submission prerequisite. Desktop execution,
 tenant binding implementation, learned failure branches, production raw-data redaction/retention,

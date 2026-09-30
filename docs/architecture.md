@@ -173,8 +173,10 @@ uses HumanActionRecord under a matching human ownership epoch. A separate `demo:
 waits for explicit terminal return, verifies the resolved warning/context, and completes the bank
 inquiry through policy-checked SurfaceAdapter actions on the same page. Generic replay still returns
 one intervention result; no automatic mid-artifact resume engine or approval bypass was added.
-The recorder and completion are proven by simulated browser events, not a genuine-human acceptance
-run. That personal pass remains required; see `human-handoff.md`.
+Simulations test the mechanism; genuine run `67e7318d-2874-4a8f-8917-89c4bd19a2fe` separately proves
+one personally confirmed manual click, explicit handback and verified completion on the same session.
+Its value-free evidence records epochs 0→1→2→3→4 and zero model calls; see `human-handoff.md`.
+This confirms the existing design without extending it into general continuation or authenticated identity.
 
 ## Core invariants
 
