@@ -76,7 +76,7 @@ The audit itself introduced no recorder. The subsequent ADR-010 slice implements
 path: 13 new simulated tests, 195 total passing; original discovery/replay/provider behavior remains
 unchanged apart from recording during handoff. The author subsequently personally performed and
 reported the accepted run above. Its two-file publication and four matched completion checkpoints
-close A1. An operator console, authenticated approval, automatic continuation and another LLM run
+close A1. An operator console, authenticated approval, general automatic workflow continuation and another LLM run
 remain unnecessary. The earlier NOT READY verdict was correct then and is preserved in the journal.
 
 **A2: Missing committed exceptional replay log — fixed.** Existing tests were not the requested

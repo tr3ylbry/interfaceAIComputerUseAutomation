@@ -156,7 +156,7 @@ is not a general evidence-redaction system. Guard errors fail closed.
 
 The guard stays installed during human ownership; handoff is not an allowlist bypass. A denied
 human navigation prevents reacquisition, but explicit disposal remains possible. There is no
-automatic continuation or rewriting of a previously returned intervention result.
+general automatic workflow continuation or rewriting of a previously returned intervention result.
 
 Limitations: Chromium-only protocol enforcement, one managed page, no service-worker applications,
 and no general data-exfiltration protection. Same-document history/hash changes and non-network

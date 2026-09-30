@@ -13,7 +13,7 @@ The model discovers. The artifact becomes the reusable capability. Deterministic
 - **Policy engine** — evaluates every proposed action before execution.
 - **Evidence recorder** — writes structured events plus richer failure evidence.
 - **Evidence publisher** — constructs allowlisted public projections and validates the complete bundle before persistence.
-- **Intervention coordinator** — pauses automation and transfers the same live session to a human; automatic continuation is not implemented.
+- **Intervention coordinator** — pauses automation and transfers the same live session to a human; explicit handback/completion is proven for the demo, but general automatic workflow continuation is not implemented.
 
 ## Dependency direction
 
@@ -164,8 +164,8 @@ for deterministic CI tests of the ownership invariant.
 
 The coordinator retains InterventionRequest, session, event history and runtime context in an
 in-memory handoff map. `getHandoff` returns a snapshot; `releaseHandoff` closes the retained session.
-Normal terminal results close their sessions. A failed handoff also closes the session. Automatic
-continuation is deliberately absent. Adapter handoff rejects in-flight actions and invalidates
+Normal terminal results close their sessions. A failed handoff also closes the session. General
+automatic workflow continuation is deliberately absent. Adapter handoff rejects in-flight actions and invalidates
 old target references; target resolution detects ownership changes across awaits.
 
 ADR-010 closes the implementation gap identified by the submission audit: a browser event recorder

@@ -2,9 +2,17 @@
 
 Take-home project for interface.ai.
 
-The system is designed around a simple product boundary:
+Provide a natural-language goal, a target application, and typed inputs and outputs. An LLM explores
+the UI once during discovery; a successful workflow is compiled into a typed, versioned JSON capability.
+Future executions supply new inputs and replay its ordered steps deterministically, without using
+an LLM to decide what to do next.
 
-> The model discovers. The artifact becomes the reusable capability. Deterministic replay is the production execution path.
+The demonstrated slice looks up savings balances in a controlled legacy-bank UI. It includes genuine
+LLM discovery, model-free replay for a different fake member, and human intervention with recorded
+manual work, explicit handback and successful automation completion in the same browser session.
+
+**Start here:** [Setup](#setup) · [Architecture report](REPORT.md) ·
+[Evidence guide](evidence/README.md) · [Technical architecture](docs/architecture.md)
 
 ## Current status
 
@@ -229,8 +237,10 @@ evidence once personally, then submit. No additional implementation or paid disc
 
 Authenticated artifact approval is stretch work, not a submission prerequisite. Desktop execution,
 tenant binding implementation, learned failure branches, production raw-data redaction/retention,
-and automatic continuation remain outside this slice. Happy-path compilation does not invent
-MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture. Further paid discovery
+and general automatic workflow continuation remain outside this slice. Explicit handback followed
+by automation completion is proven for the demonstrated workflow; inferring where and how to resume
+arbitrary workflows after arbitrary human intervention is not implemented. Happy-path compilation
+does not invent MEMBER_NOT_FOUND or host-busy declarations from the hand-authored fixture. Further paid discovery
 requires separate authorization; the accepted genuine bundle remains unchanged.
 
 The earlier `member-savings.ts` runner remains as the original adapter regression fixture; `npm run

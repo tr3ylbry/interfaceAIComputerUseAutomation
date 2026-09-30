@@ -105,8 +105,10 @@ an application publication gate, not general redaction/DLP, authenticated attest
 
 No operator console, queue, database, application service API, desktop adapter, or tenant override
 engine is implemented. Recovery supports declared dismiss clicks and
-checkpoint rechecks. Automatic continuation, production redaction, authenticated artifact approval,
-and broader outbound-data restrictions remain gaps. Chromium protocol dependence, unsupported
+checkpoint rechecks. General automatic workflow continuation, production redaction, authenticated
+artifact approval, and broader outbound-data restrictions remain gaps. Explicit handback followed by
+automation completion is proven for the demonstrated workflow; determining arbitrary continuation
+points after arbitrary manual intervention is not implemented. Chromium protocol dependence, unsupported
 auxiliary pages/service workers, and unguarded non-document/browser-internal traffic limit the
 safety claim. Discovery action targeting is semantic/ref-based (no coordinate fallback), while
 observation is hybrid screenshot plus structured semantic state. Current compilation supports
